@@ -64,16 +64,16 @@ Python-скрипты для проверки JSON, описаний и regex-к
 ## Как скачать skill
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
-Замени `YOUR_USERNAME` на свой GitHub-ник.
+Замени `evrytests-maker` на свой GitHub-ник.
 
 Пример:
 
 ```bash
-git clone https://github.com/kiaraweimannrdmx/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -82,7 +82,7 @@ cd ace-skill
 Скачай репозиторий:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -105,7 +105,7 @@ codex
 Скачай репозиторий:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -128,7 +128,7 @@ agy
 Скачай репозиторий:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -155,7 +155,7 @@ Use the files from this repository.
 ```text
 Открой или скачай этот GitHub-репозиторий:
 
-https://github.com/YOUR_USERNAME/ace-skill
+https://github.com/evrytests-maker/ace-skill
 
 Прочитай SKILL.md.
 Используй ACE-SKILL как инструкцию.

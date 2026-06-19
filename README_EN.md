@@ -64,16 +64,16 @@ Python scripts for checking JSON, descriptions, and regex keys.
 ## How to download the skill
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+Replace `evrytests-maker` with your GitHub username.
 
 Example:
 
 ```bash
-git clone https://github.com/kiaraweimannrdmx/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -82,7 +82,7 @@ cd ace-skill
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -105,7 +105,7 @@ Ask clarification questions first, then suggest fixes.
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -128,7 +128,7 @@ I need to improve a SillyTavern bot: description, lorebook, World Info, regex ke
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-skill.git
+git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
 ```
 
@@ -155,7 +155,7 @@ Open ChatGPT with agent mode or file tools and write:
 ```text
 Open or download this GitHub repository:
 
-https://github.com/YOUR_USERNAME/ace-skill
+https://github.com/evrytests-maker/ace-skill
 
 Read SKILL.md.
 Use ACE-SKILL as your instruction.
