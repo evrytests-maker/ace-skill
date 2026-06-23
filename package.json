@@ -1,0 +1,30 @@
+{
+  "name": "ace-skill",
+  "version": "4.0.0-gpt-js",
+  "description": "ACE-SKILL for SillyTavern character cards, lorebooks, JS key testing, and GPT-compatible prompt workflows.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "validate:bot": "node scripts/validate_bot_description.mjs",
+    "validate:lorebook": "node scripts/validate_lorebook_json.mjs",
+    "check:keys": "node scripts/st_lorebook_key_check.mjs",
+    "check:key": "node scripts/st_key_tester.mjs",
+    "check:tokens": "node scripts/token_check.mjs",
+    "check:all": "node scripts/validate_lorebook_json.mjs assets/lorebook_template.json && node scripts/token_check.mjs assets/lorebook_template.json --model gpt-4o"
+  },
+  "optionalDependencies": {
+    "gpt-tokenizer": "^2.9.0"
+  },
+  "keywords": [
+    "sillytavern",
+    "character-card",
+    "lorebook",
+    "world-info",
+    "prompt-engineering",
+    "chatgpt",
+    "codex"
+  ],
+  "license": "MIT"
+}

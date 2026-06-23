@@ -1,314 +1,233 @@
 ---
 name: ace-skill
 description: >
-  Optimize, fix, and create AI character cards (bots) and their SillyTavern World Info / Lorebooks.
-  Use this skill when the user asks to: fix a bot, optimize a character description, create a lorebook,
-  fix world info, improve keywords, set up recursion/groups, validate a character card JSON,
-  or convert a narrative description into a structured format. Also triggers on requests involving
-  SillyTavern bot creation, character optimization, lorebook setup, or keyword regex generation.
-  Supports English + Russian bilingual bots with proper regex patterns for both languages.
+  Create, fix, and optimize SillyTavern character cards, World Info / Lorebooks, activation keys,
+  JavaScript regex keys, greetings, and JSON validation. Use this skill for SillyTavern bot work,
+  character-card cleanup, lorebook design, keyword/regex testing, token-budget checks, and GPT-specific
+  prompt engineering for ChatGPT/Codex when explicitly requested or when the active model is GPT/OpenAI.
 ---
 
-# ace-skill
+# ACE-SKILL
 
-Оптимизируй описания ботов и lorebook для SillyTavern на основе проверенных паттернов из реальных character cards и гайда по lorebook. Этот скилл покрывает обе задачи: описание персонажа (description/first_mes/mes_example) и структуру World Info (entries/keywords/positions).
+ACE-SKILL помогает агенту создавать и исправлять SillyTavern character cards, World Info / Lorebooks, ключи активации, RU/EN regex, first messages, alternate greetings и JSON-структуры.
 
----
-
-## Дерево принятия решений
-
-- Пользователь просит "пофиксить бота / оптимизировать описание" → перейди к **Воркфлоу оптимизации бота**
-- Пользователь просит "создать lorebook / world info" → перейди к **Воркфлоу создания lorebook**
-- Пользователь просит "пофиксить всё" → выполни ОБА воркфлоу последовательно: сначала бота, потом lorebook
-- Пользователь присылает JSON-файл → сначала валидация (`validate_lorebook_json.py` или `validate_bot_description.py`), потом оптимизация
-- Пользователь присылает текстовое описание персонажа → конвертируй в структурированный формат, затем создай lorebook
+Главное изменение версии 4: основной workflow переведён на JavaScript/Node, а Python-скрипты сохранены как legacy в `legacy/python/`.
 
 ---
 
-## Фаза распроса (обязательная)
+## 0. Routing: какой набор инструкций брать
 
-**Перед ЛЮБОЙ работой над ботом или lorebook агент ОБЯЗАН задать уточняющие вопросы пользователю.**
+Выбери режим перед работой.
 
-Цель: понять, что именно хочет пользователь, чтобы результат соответствовал ожиданиям.
+### GPT / ChatGPT / Codex режим
 
-### Вопросы для уточнения (адаптируй под контекст):
+Используй `gpt/README_GPT.md` и `gpt/SKILL_GPT.md`, если выполняется хотя бы одно условие:
 
-1. **"Что именно вы хотите сделать?"**
-   - Создать нового бота с нуля?
-   - Починить/оптимизировать существующего бота?
-   - Создать только lorebook?
-   - Починить только lorebook?
-   - Всё вместе?
+- пользователь явно просит версию для GPT, ChatGPT, OpenAI, Codex или “моделей GPT”;
+- задача связана с написанием промптов для ChatGPT / Custom GPT / Codex;
+- текущий агент — GPT/OpenAI-модель и пользователь просит улучшить сам skill/prompt;
+- пользователь жалуется, что GPT слишком буквально понял инструкцию, теряет логику, путает этапы или берёт не те промпты.
 
-2. **"Какой язык ролки?"**
-   - Только русский?
-   - Только английский?
-   - Билингвальный (RU+EN)?
-   - От этого зависит, на каких языках писать ключевые слова и диалоги
+В GPT-режиме не используй промпты из `gpt/` для Claude/Kimi/Gemini, если пользователь этого не просил. GPT-промпты — это отдельный слой совместимости, а не замена всего skill.
 
-3. **"Есть ли у вас уже описание персонажа или нужно создать с нуля?"**
-   - Если есть текст → попроси вставить его
-   - Если есть JSON-файл → попроси загрузить
-   - Если с нуля → попроси краткое описание/концепт
+### Общий режим Claude/Kimi/Gemini
 
-4. **"Какой сеттинг/мир?"**
-   - Оригинальный мир или существующий фандом?
-   - От этого зависит детализация lorebook
+Используй основной `SKILL.md` + `references/`, если:
 
-5. **"Есть ли NSFW-контент?"**
-   - Если да → включи соответствующие предпочтения в описание персонажа или отдельную запись при необходимости
-   - Это влияет на тон и границы контента в lorebook
+- пользователь просит обычную работу с character card/lorebook без GPT-специфики;
+- задача не требует ChatGPT/Codex-совместимого промпта;
+- пользователь явно говорит, что работает в Claude, Kimi, Gemini или другом не-OpenAI агенте.
 
-6. **"Какие есть важные NPC или локации?"**
-   - Каждый NPC получает свою запись в lorebook
-   - Каждая локация получает свою запись
+### Смешанный режим
 
-### Правила фазы распроса:
+Если нужно создать один бот, который будет работать в разных моделях:
 
-- Задавай вопросы ПО ОДНОМУ (не все сразу)
-- Дождись ответа пользователя перед следующим вопросом
-- Если запрос пользователя очень краткий/размытый → задай ВСЕ вопросы
-- Если пользователь дал подробную информацию → пропусти уже отвеченные вопросы
-- После сбора ответов — суммируй план и попроси подтверждение
-- Только после подтверждения пользователя — приступай к работе
-- НЕ начинай писать описание бота или lorebook до подтверждения
+1. Создай базовую карту по общим правилам.
+2. Для GPT добавь отдельный `gpt/`-промпт или отдельный preset/инструкцию.
+3. Не подмешивай GPT-правила в общие файлы без явной причины.
 
-### Пример диалога:
+---
 
-```
-User: "сделай бота"
-Agent: "Привет! Давайте уточним детали.
+## 1. Дерево задач
 
-1. Какой язык ролки — русский, английский или оба?
-2. У вас уже есть описание персонажа или создаём с нуля?
-3. Какой сеттинг — свой мир или фандом?"
+- “Пофиксить бота / оптимизировать description / first_mes / mes_example” → workflow character card.
+- “Создать lorebook / World Info / memory book” → workflow lorebook.
+- “Проверить ключи / regex / почему запись не активируется” → Node key tester.
+- “Проверить токены / контекст / бюджет” → universal token checker.
+- “Сделать промпт под ChatGPT / Codex / GPT” → GPT prompt workflow из `gpt/SKILL_GPT.md`.
+- “Пофиксить всё” → сначала character card, потом lorebook, потом ключи, потом токены.
 
-User: "русский, с нуля, киберпанк"
-Agent: "Отлично! Ещё пара вопросов:
+---
 
-4. Будет ли NSFW-контент?
-5. Какие важные NPC или локации есть в вашем мире?"
+## 2. Фаза уточнения
 
-User: "да, есть NPC-хакер и локация — кафе"
-Agent: "Понял! Вот план:
-- Киберпанк-бариста-хакер, русский, с NSFW
-- Lorebook: WORLD, NPC (хакер), Location (кафе)
-- Описание: ~700-1500 токенов
+Не задавай лишние вопросы, если пользователь уже дал достаточно данных или явно разрешил приступать.
 
-Всё верно? Начинаю?"
+Если данных мало, задай минимальный набор вопросов:
 
-User: "да"
-Agent: [начинает работу]
+1. Что именно делаем: новый бот, правка карты, lorebook, ключи, GPT-промпт или всё вместе?
+2. Язык ролки: русский, английский или RU+EN?
+3. Есть ли файл JSON/карта/описание или создаём с нуля?
+4. Какой целевой агент/модель: GPT/ChatGPT/Codex, Claude, Kimi, Gemini, SillyTavern preset?
+5. Для lorebook: нужны широкие, точные или смешанные ключи?
+
+Если пользователь уже дал разрешение работать — не стопорись подтверждениями. Сделай лучший возможный вариант и явно укажи принятые допущения.
+
+---
+
+## 3. Workflow character card
+
+Перед редактированием прочитай:
+
+- `references/bot_writing_rules.md`
+- при GPT-режиме: `gpt/prompts/gpt_character_card_writer.md`
+
+### Структура description
+
+Description должен быть в третьем лице, обычно на английском, если пользователь не попросил иначе.
+
+Рекомендуемый формат:
+
+```text
+[Character("Name")]
+[Appearance("...")]
+[Mind("...")]
+[Personality("...")]
+[Likes("...")]
+[Dislikes("...")]
+[Relationships("...")]
+[Scenario("...")]
 ```
 
----
+Разделяй:
 
-## Воркфлоу оптимизации бота
+- `Mind` = внутреннее: мотивации, страхи, цели, когнитивные паттерны.
+- `Personality` = внешнее: поведение, манеры, речь, реакции.
 
-**Перед началом прочитай `references/bot_writing_rules.md`**
+### first_mes и alternate_greetings
 
-1. Прочитай `references/bot_writing_rules.md` — ознакомься с правилами написания описаний
-2. Проанализируй текущее описание бота. Найди проблемы:
-   - отсутствие структуры (сплошной текст)
-   - смешивание Mind и Personality в одну секцию
-   - избыточный или недостаточный объём
-   - отсутствие примеров диалогов (mes_example)
-   - слабый first_mes (неинформативный или слишком короткий)
-3. Конвертируй описание в структурированный формат `[Section("...")]`:
-   - `[Character("Имя")]` — имя персонажа
-   - `[Appearance("...")]` — внешность
-   - `[Mind("...")]` — внутренний мир: мотивации, страхи, цели, когнитивные паттерны
-   - `[Personality("...")]` — поведенческие черты: как ведёт себя, речевые паттерны, манеры
-   - `[Likes("...")]`, `[Dislikes("...")]` — предпочтения
-   - `[Relationships("...")]` — связи с другими персонажами
-   - `[Scenario("...")]` — сценарий/контекст ролеплея
-4. Убедись, что **Mind ≠ Personality**:
-   - Mind = как думает (внутреннее)
-   - Personality = как ведёт себя (внешнее)
-5. Проверь токен-объём описания. Целевой диапазон: **700–1500 токенов**. Если больше — сжимай, удаляя дублирование. Если меньше — добавь детали через конкретику, а не общие фразы.
-6. Оптимизируй `first_mes`:
-   - Объём: **100–200 слов**
-   - Формат: кинематографичное вступление с описанием сцены, действия, мыслей
-   - Должен показывать характер через действие, а не перечислять черты
-   - Заканчивается диалогом или вопросом к {{user}}
-7. Создай/исправь `mes_example`:
-   - Ровно **3 примера** диалога
-   - Каждый начинается с `<START>`
-   - Показывают разные стороны персонажа: обычное поведение, конфликт, флирт/интим (если NSFW)
-8. Добавь `alternate_greetings` на русском языке, если отсутствует. Минимум 1 альтернативное приветствие.
-9. Запусти валидацию:
-   ```
-   python3 scripts/validate_bot_description.py <путь_к_файлу>
-   ```
-   Исправь все ошибки, которые выдаст скрипт.
+Новое правило:
 
----
+- `first_mes`: минимум 250 слов.
+- `alternate_greetings`: каждое минимум 250 слов.
+- Верхний лимит по словам не ставится.
+- Ограничение сверху заменено токен-бюджетом: проверяй через `scripts/token_check.mjs`.
 
-## Воркфлоу создания lorebook
+Приветствие должно быть сценой, а не анкетой:
 
-**Перед началом прочитай `references/lorebook_rules.md`**
+- показать место, действие, настроение и конфликт;
+- показать характер через поведение;
+- дать {{user}} понятную точку входа;
+- не писать действия, реплики или мысли за {{user}}.
 
-1. Прочитай `references/lorebook_rules.md` — правила создания записей lorebook
-2. Прочитай `references/prompt_architecture.md` — как устроен "Big Prompt" и как позиция/глубина влияют на поведение модели
-3. Разбей информацию о персонаже на логические записи по **Стандартному шаблону** (7 записей + NPC-детали):
+### mes_example
 
-   | Запись | Тип | Позиция | Order | Depth | Ключи |
-   |--------|-----|---------|-------|-------|-------|
-   | WORLD | constant | after_char | 100 | 1 | нет (всегда активна) |
-   | NPC | constant | after_char | 90 | 1 | нет (всегда активна) |
-   | Location | constant | before_char | 70 | 4 | нет (всегда активна) |
-   | NPC_detail | normal | after_char | 140–180 | 4 | `[имя_NPC]` |
-   | Backstory | normal | after_char | 150 | 4 | `[trauma, past, childhood, memory]` |
-   | Family | normal | after_char | 160 | 4 | `[family words: mother, father, sister, brother]` |
-   
+- Ровно 3 блока `<START>`.
+- Каждый показывает отдельный режим поведения персонажа.
+- Не копирует first_mes.
+- Не пишет за {{user}} сверх коротких нейтральных реплик-примеров, если пользователь не просил иначе.
 
-   Общее количество записей: **7–10** (включая NPC_detail для каждого дополнительного NPC).
+### Проверка
 
-4. Прочитай `references/keyword_strategies.md` — выбери стратегию ключевых слов:
-   - **Агрессивная** — много ключей, широкий охват, риск ложных срабатываний
-   - **Точная** — минимум ключей, только точные совпадения, минимум ложных срабатываний
-   - **Смешанная** — баланс: regex для широких категорий + точные ключи для специфики
-5. Прочитай `references/regex_templates.md` — используй готовые regex-паттерны для ключевых слов. Все паттерны должны быть **двуязычными (EN + RU)**.
-6. Для каждой записи задай корректные параметры:
-   - **position**: `before_char` (влияет на поведение {{char}}) или `after_char` (контекст/информация)
-   - **order**: определяет порядок вставки в prompt (меньше = раньше)
-   - **depth**: сколько последних сообщений сканируется на ключи (1 = последнее, 4 = последние 4)
-   - **constant**: true = запись всегда активна без ключей; false = требует ключевых слов
-7. Запусти валидацию:
-   ```
-   python3 scripts/validate_lorebook_json.py <путь_к_файлу>
-   ```
-   Исправь все ошибки и варнинги.
-8. Если создаёшь lorebook с нуля — скопируй структуру из `assets/lorebook_template.json` как отправную точку.
-
----
-
-## Стандарты качества
-
-| Компонент | Стандарт |
-|-----------|----------|
-| Description | 700–1500 токенов, структурированный формат `[Section]`, 3-е лицо, английский |
-| Lorebook | 7–10 записей, regex-ключи, билингвальный (EN+RU), корректные position/order/depth |
-| first_mes | 100–200 слов, кинематографичное вступление, показывает характер через действие |
-| mes_example | 3 примера с `<START>`, покрывают разные аспекты поведения |
-| alternate_greetings | Минимум 1 на русском языке |
-
----
-
-## Гайд по загрузке референсов
-
-| Вопрос | Какой файл читать |
-|--------|-------------------|
-| Как писать описание бота? | `references/bot_writing_rules.md` |
-| Как структурировать lorebook? | `references/lorebook_rules.md` |
-| Как position/order/depth влияют на prompt? | `references/prompt_architecture.md` |
-| Какие стратегии ключевых слов использовать? | `references/keyword_strategies.md` |
-| Где взять готовые regex-паттерны? | `references/regex_templates.md` |
-| Нужна отправная точка для lorebook? | `assets/lorebook_template.json` |
-| Как проверить русский regex-ключ? | `references/ru_regex_checker_reference.md` |
-| Полная системная инструкция RU-чекера? | `references/ru_regex_checker_agent_prompt.md` |
-
----
-
-## Гайд по использованию скриптов
-
-### `scripts/validate_bot_description.py`
-- **Когда запускать**: после редактирования description, first_mes, mes_example
-- **Команда**: `python3 scripts/validate_bot_description.py <путь_к_файлу>`
-- **Что проверяет**:
-  - Наличие обязательных секций (Character, Appearance, Mind, Personality)
-  - Разделение Mind и Personality (предупреждение если совпадение > 30%)
-  - Токен-объём (warn если > 1500 или < 700)
-  - first_mes: объём 100–200 слов, наличие описания сцены
-  - mes_example: ровно 3 примера с `<START>`
-  - alternate_greetings: минимум 1 на русском
-- **Ожидаемый вывод**: `OK` или список ошибок с указанием строк
-
-### `scripts/validate_lorebook_json.py`
-- **Когда запускать**: после создания или редактирования lorebook JSON
-- **Команда**: `python3 scripts/validate_lorebook_json.py <путь_к_файлу>`
-- **Что проверяет**:
-  - Корректность JSON-структуры
-  - Наличие обязательных полей (uid, key, content, order, position, depth)
-  - Order в допустимых пределах (0–100000)
-  - Depth в допустимых пределах (1–5)
-  - Position: только `before_char` или `after_char`
-  - Constant-записи без ключей
-  - Нормальные записи с хотя бы 1 ключом
-  - Regex-валидность ключей (если ключ содержит `(` или `|`)
-- **Ожидаемый вывод**: `VALID` или список ошибок с uid проблемных записей
-
-### `scripts/ru_regex_check.py` — Проверка русских regex-ключей
-- **Когда запускать**: при создании или проверке русских regex-ключей lorebook
-- **Зачем**: гарантирует, что regex-ключ корректен и ловит нужные словоформы, но не ловит лишние
-- **Команды**:
-  ```bash
-  # Линтинг regex-синтаксиса и определение типа ключа
-  python3 scripts/ru_regex_check.py '<REGEX>' --lint --kind name|word|phrase --strategy regex
-
-  # Проверка на реальных кандидатах (позитивных и негативных)
-  python3 scripts/ru_regex_check.py '<REGEX>' --kind name 'Годжо' 'я встретил Годжо' 'годжо' 'СуперГоджо'
-
-  # Автоисправление JSON-экранирования
-  python3 scripts/ru_regex_check.py '<REGEX>' --fix
-
-  # Замена \s* на \s+ (обязательный пробел)
-  python3 scripts/ru_regex_check.py '<REGEX>' --fix-strict-space
-  ```
-- **Типы ключей**:
-  - `name` — имена, фамилии, прозвища, названия (строгий регистр)
-  - `word` — одиночные слова, термины
-  - `phrase` — словосочетания (2+ слова)
-- **Стратегии**:
-  - `regex` — regex с границами `(?:^|[^а-яА-ЯёЁ])...(?![а-яА-ЯёЁ])` (рекомендуется)
-  - `full-form` — перечисление всех форм слова
-  - `stem` — обрезанная основа (только длинные уникальные корни)
-- **Вывод**: `INFO` (тип/стратегия), `FIX` (автоисправление), `WARN` (риск), `ERROR` (критическая ошибка), `OK:`/NO:` (результат кандидата), `SKIP non-ru:` (не русский)
-- **Правила**: читай `references/ru_regex_checker_reference.md` для шаблонов и `references/ru_regex_checker_agent_prompt.md` для полной системной инструкции агента
-
----
-
-## Форматы входных и выходных данных
-
-### Вход: текстовое описание персонажа
+```bash
+node scripts/validate_bot_description.mjs character.json --model gpt-4o
+node scripts/token_check.mjs character.json --model gpt-4o
 ```
-{{char}} — эльфийка-лучница, 500 лет, живёт в лесу...
-[длинное неструктурированное описание]
-```
-### Выход: оптимизированный бот + lorebook JSON
-- `character.json` — описание в формате `[Section]` с first_mes, mes_example
-- `lorebook.json` — 7–10 записей с regex-ключами
-
-### Вход: существующий lorebook JSON
-```json
-{"entries": [{"uid": 1, "key": ["sword"], "content": "..."}]}
-```
-### Выход: валидированный и оптимизированный lorebook JSON
-- Исправленные ключи (regex вместо точных совпадений где нужно)
-- Корректные order/position/depth
-- Добавлены отсутствующие записи (WORLD, NPC, Location)
 
 ---
 
-## Правила работы с билингвальным контентом (EN + RU)
+## 4. Workflow lorebook / World Info
 
-1. **Описание бота** — всегда пиши на **английском**. Модели лучше понимают английский для инструкций.
-2. **first_mes** — пиши на языке, который запросил пользователь (обычно русский для RU-аудитории).
-3. **Ключевые слова lorebook** — всегда **двуязычные**: используй regex с обоими языками. Пример: `(?i)(mother|mom|мама|мамочка|матер)`.
-4. **alternate_greetings** — минимум одно на русском.
+Перед созданием или правкой lorebook прочитай:
 
+- `references/lorebook_rules.md`
+- `references/prompt_architecture.md`
+- `references/keyword_strategies.md`
+- `references/regex_templates.md`
+
+### Базовые записи
+
+Минимальный набор:
+
+| Запись | Тип | Позиция | Order | Depth | Ключи |
+|---|---|---:|---:|---:|---|
+| WORLD | constant | after_char | 100 | 1 | нет |
+| NPC | constant | after_char | 90 | 1 | нет |
+| Location | constant | before_char | 70 | 4 | нет |
+| NPC_detail | normal | after_char | 140–180 | 4 | имя NPC |
+| Backstory | normal | after_char | 150 | 4 | past/childhood/trauma + RU |
+| Family | normal | after_char | 160 | 4 | family/mother/father + RU |
+
+### Правила ключей
+
+SillyTavern regex-ключи должны быть JavaScript regex literal:
+
+```text
+/(?:mother|mom|мама|мать|матер[ьи]) /iu
+```
+
+Правильнее:
+
+```text
+/(?:mother|mom|мама|мам[ауыое]|мать|матер(?:и|ью|ью|ей))/iu
+```
+
+Не используй Python `re` как финальную проверку. Основная проверка — Node/JavaScript.
+
+### Проверка lorebook
+
+```bash
+node scripts/validate_lorebook_json.mjs lorebook.json
+node scripts/st_lorebook_key_check.mjs lorebook.json --text "Годжо вспоминает мать и прошлое" --char "Gojo" --user "User"
+node scripts/token_check.mjs lorebook.json --model gpt-4o
+```
 
 ---
 
-## Чеклист перед ответом пользователю
+## 5. Workflow GPT-промптов
 
-- [ ] Description в формате `[Section]` с разделением Mind/Personality
-- [ ] Токен-объём 700–1500
-- [ ] first_mes: 100–200 слов, кинематографичный
-- [ ] mes_example: 3 примера с `<START>`
-- [ ] alternate_greetings: 1+ на русском
-- [ ] Lorebook: 7–10 записей
-- [ ] Все ключи — regex, билингвальные (EN+RU)
-- [ ] WORLD/NPC/Location — constant, корректные order/position/depth
-- [ ] Русские regex-ключи проверены через `ru_regex_check.py`
-- [ ] Валидация скриптами пройдена без ошибок
+Если задача про ChatGPT/GPT/Codex, используй `gpt/SKILL_GPT.md`.
+
+Короткая версия GPT-правила:
+
+- пиши явные инструкции, а не намёки;
+- дроби сложную работу на trigger/instruction pairs;
+- отделяй `Identity`, `Instructions`, `Workflow`, `Output Contract`, `Examples`, `Self-check`;
+- формулируй позитивно: “делай X” вместо длинного списка “не делай Y”;
+- указывай, какие файлы читать и когда;
+- добавляй примеры плохого/хорошего вывода;
+- для Codex: всегда указывай разрешённые файлы, порядок изменения, тесты и формат отчёта.
+
+Важно: из сторонних SillyTavern GPT-пресетов можно брать только безопасные структурные правила промптинга: формат секций, length presets, POV/knowledge boundaries, genre/style toggles, blindspot, plot push. Нельзя переносить unsafe/jailbreak/no-refusal/filter-bypass блоки.
+
+---
+
+## 6. JavaScript scripts
+
+Основные скрипты:
+
+| Скрипт | Назначение |
+|---|---|
+| `scripts/validate_bot_description.mjs` | Проверка character card, greetings ≥250 слов, mes_example, секций |
+| `scripts/validate_lorebook_json.mjs` | Проверка структуры World Info JSON |
+| `scripts/st_key_tester.mjs` | Проверка одного ключа как SillyTavern-like JS regex/plaintext matcher |
+| `scripts/st_lorebook_key_check.mjs` | Проверка ключей lorebook на scan text/chat buffer |
+| `scripts/token_check.mjs` | Универсальный токен-чекер с OpenAI optional tokenizer и fallback-оценкой |
+| `scripts/token_model_map.mjs` | Карта моделей → token profile |
+
+Python-версии лежат в `legacy/python/` и используются только если явно нужен старый workflow.
+
+---
+
+## 7. Чеклист перед финальным ответом
+
+- [ ] Выбран правильный режим: общий или GPT.
+- [ ] GPT-промпты не применены к Claude/Kimi/Gemini без запроса.
+- [ ] Description структурирован, Mind и Personality разделены.
+- [ ] `first_mes` ≥250 слов.
+- [ ] Все `alternate_greetings` ≥250 слов.
+- [ ] `mes_example` содержит ровно 3 `<START>`.
+- [ ] Lorebook имеет логичные constant/normal entries.
+- [ ] Regex-ключи проверены как JavaScript regex, не Python-only.
+- [ ] Токен-бюджет проверен через `token_check.mjs`.
+- [ ] Если менялись файлы, показан краткий список изменений и команды проверки.

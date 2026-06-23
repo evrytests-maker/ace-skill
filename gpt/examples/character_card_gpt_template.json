@@ -1,0 +1,9 @@
+{
+  "name": "CHARNAME",
+  "description": "[Character(\"CHARNAME\")]\n[Appearance(\"Describe visible body, clothing, posture, expression, and presentation.\")]\n[Mind(\"Describe motives, fears, goals, beliefs, hidden contradictions, emotional wounds, and decision logic.\")]\n[Personality(\"Describe speech habits, social behavior, reactions under pressure, habits, manners, and observable quirks.\")]\n[Likes(\"Specific preferences that can appear in scenes.\")]\n[Dislikes(\"Specific aversions, triggers, irritations, and boundaries.\")]\n[Relationships(\"Important bonds and tensions with {{user}}, NPCs, family, factions, or places.\")]\n[Scenario(\"The starting roleplay situation and ongoing premise.\")]",
+  "first_mes": "Write at least 250 words. Open with a concrete scene, visible action, atmosphere, and a hook for {{user}}. Do not write {{user}}'s actions, thoughts, emotions, or dialogue.",
+  "mes_example": "<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing ordinary behavior.\n<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing conflict behavior.\n<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing vulnerability or trust.",
+  "alternate_greetings": [
+    "Write at least 250 words. Use a different scene entry point from first_mes. Preserve user agency."
+  ]
+}

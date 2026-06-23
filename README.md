@@ -1,82 +1,38 @@
-# ACE-SKILL
+# ACE-SKILL v4 GPT/JS
 
-**ACE-SKILL** — skill-пакет для ИИ-агентов, которые помогают создавать, исправлять и улучшать SillyTavern-ботов.
+**ACE-SKILL** — skill-пакет для ИИ-агентов, которые создают, исправляют и оптимизируют SillyTavern character cards, World Info / Lorebooks, ключи активации, JavaScript regex, greetings и token budgets.
 
-Он нужен для работы с **character card**, **lorebook / World Info**, ключами активации, RU/EN regex-ключами и JSON-файлами.
-
-> Коротко: скачай репозиторий, дай агенту прочитать `SKILL.md`, затем попроси его исправить или создать бота.
+Версия v4 добавляет отдельную GPT-ветку и переводит активные скрипты на JavaScript/Node. Python оставлен как legacy.
 
 ---
 
-## Содержание
+## Главное в v4
 
-- [Что это](#что-это)
-- [Что умеет](#что-умеет)
-- [Структура проекта](#структура-проекта)
-- [Быстрый старт](#быстрый-старт)
-- [Использование в разных агентах](#использование-в-разных-агентах)
-  - [Codex CLI](#codex-cli)
-  - [Claude Code](#claude-code)
-  - [Antigravity CLI](#antigravity-cli)
-  - [ChatGPT](#chatgpt)
-- [Проверочные скрипты](#проверочные-скрипты)
-- [Примеры запросов](#примеры-запросов)
-- [Важные ограничения](#важные-ограничения)
-- [Лицензия](#лицензия)
+- Добавлена отдельная папка `gpt/` для ChatGPT, OpenAI API, Codex и Custom GPT prompts.
+- Главный `SKILL.md` теперь сам выбирает режим: общий workflow или GPT workflow.
+- GPT-промпты не применяются к Claude/Kimi/Gemini автоматически.
+- Проверка ключей переведена на Node/JavaScript regex, ближе к SillyTavern.
+- Добавлен universal token checker.
+- `first_mes` и каждое `alternate_greetings`: минимум 250 слов, без верхнего лимита по словам.
+- Старые Python-скрипты перенесены в `legacy/python/`.
 
 ---
 
-## Что это
-
-ACE-SKILL — это не обычная программа и не отдельный бот.
-
-Это набор файлов, который объясняет ИИ-агенту:
-
-- как правильно улучшать описание персонажа;
-- как собирать character card;
-- как проектировать lorebook / World Info;
-- как делать ключи активации;
-- как писать русские и английские regex-ключи;
-- как проверять JSON и структуру файлов.
-
-Главный файл skill-пакета:
-
-```text
-SKILL.md
-```
-
-Именно его должен прочитать агент перед работой.
-
----
-
-## Что умеет
-
-ACE-SKILL помогает агенту выполнять такие задачи:
-
-| Задача | Что делает skill |
-|---|---|
-| Улучшение бота | Чистит и структурирует описание персонажа |
-| Character card | Помогает собрать логичную структуру персонажа |
-| First message | Улучшает первое сообщение бота |
-| Dialogue examples | Помогает оформить примеры диалога |
-| Lorebook / World Info | Создаёт и исправляет записи мира |
-| Keywords | Подбирает ключи активации |
-| RU regex | Делает русские regex-ключи с учётом падежей и форм слов |
-| EN keywords | Делает английские ключи |
-| JSON validation | Проверяет JSON через скрипты |
-| Agent workflow | Заставляет агента сначала задавать вопросы, а потом редактировать |
-
----
-
-## Структура проекта
+## Структура
 
 ```text
 ace-skill/
 ├── SKILL.md
 ├── README.md
 ├── README_EN.md
+├── package.json
 ├── assets/
 │   └── lorebook_template.json
+├── gpt/
+│   ├── README_GPT.md
+│   ├── SKILL_GPT.md
+│   ├── prompts/
+│   └── examples/
 ├── references/
 │   ├── bot_writing_rules.md
 │   ├── keyword_strategies.md
@@ -85,391 +41,152 @@ ace-skill/
 │   ├── regex_templates.md
 │   ├── ru_regex_checker_agent_prompt.md
 │   └── ru_regex_checker_reference.md
-└── scripts/
-    ├── ru_regex_check.py
-    ├── validate_bot_description.py
-    └── validate_lorebook_json.py
+├── scripts/
+│   ├── validate_bot_description.mjs
+│   ├── validate_lorebook_json.mjs
+│   ├── st_key_tester.mjs
+│   ├── st_lorebook_key_check.mjs
+│   ├── token_check.mjs
+│   ├── token_model_map.mjs
+│   └── lib/
+├── legacy/
+│   └── python/
+└── tests/
+    └── key-fixtures/
 ```
-
-### Главные файлы
-
-| Файл / папка | Назначение |
-|---|---|
-| `SKILL.md` | Основная инструкция для агента |
-| `assets/` | Шаблоны |
-| `references/` | Правила, справка и методики |
-| `scripts/` | Проверка JSON и regex |
-| `README.md` | Русская документация |
-| `README_EN.md` | Английская документация |
 
 ---
 
 ## Быстрый старт
 
-Скачай репозиторий:
-
 ```bash
 git clone https://github.com/evrytests-maker/ace-skill.git
 cd ace-skill
+npm install
 ```
 
-Потом открой папку в любом агенте и дай команду:
+Минимально `npm install` не обязателен для большинства проверок, потому что скрипты используют стандартный Node.js. Для более точного OpenAI token count можно установить optional dependency из `package.json`.
+
+Попроси агента:
 
 ```text
-Прочитай SKILL.md и используй ACE-SKILL как инструкцию.
-Мне нужно улучшить SillyTavern-бота, character card, lorebook, ключи и JSON.
-Сначала задай уточняющие вопросы, потом предложи план исправлений.
+Прочитай SKILL.md и используй ACE-SKILL.
+Мне нужно улучшить SillyTavern character card, lorebook, ключи и JSON.
+Если задача про GPT/ChatGPT/Codex — используй gpt/SKILL_GPT.md.
 ```
 
 ---
 
-## Использование в разных агентах
+## GPT режим
 
-Есть два способа использования:
+Используй GPT-режим, если работаешь с:
 
-1. **Как обычный репозиторий** — агент открывает папку и читает `SKILL.md`.
-2. **Как настоящий skill** — репозиторий кладётся в специальную папку skills конкретного агента.
+- ChatGPT;
+- OpenAI API;
+- Custom GPT;
+- Codex;
+- GPT-specific SillyTavern preset;
+- проблемами, где GPT слишком буквально понимает промпт.
+
+Команда для агента:
+
+```text
+Read SKILL.md. This task targets ChatGPT/Codex, so use gpt/SKILL_GPT.md and gpt/prompts/. Do not apply GPT-only prompts to Claude/Kimi unless I ask.
+```
+
+Из сторонних GPT-пресетов можно брать только безопасные правила структуры промптов: модульность, length presets, POV boundaries, character blindspot, no-user-control, plot push. Не переносить jailbreak/no-refusal/filter-bypass инструкции.
 
 ---
 
-### Codex CLI
+## Проверочные команды
 
-#### Вариант 1: использовать как обычный проект
-
-```bash
-git clone https://github.com/evrytests-maker/ace-skill.git
-cd ace-skill
-codex
-```
-
-После запуска Codex напиши:
-
-```text
-Read SKILL.md and use ACE-SKILL.
-Help me improve a SillyTavern character card, lorebook, regex keys, and JSON files.
-Ask clarification questions before editing.
-```
-
-#### Вариант 2: установить как skill для Codex
-
-Codex ищет пользовательские skills в папке:
-
-```text
-~/.agents/skills/
-```
-
-Установка:
+### Character card
 
 ```bash
-mkdir -p ~/.agents/skills
-git clone https://github.com/evrytests-maker/ace-skill.git ~/.agents/skills/ace-skill
+node scripts/validate_bot_description.mjs character.json --model gpt-4o
+node scripts/token_check.mjs character.json --model gpt-4o
 ```
 
-Запуск:
+### Lorebook
 
 ```bash
-codex
+node scripts/validate_lorebook_json.mjs lorebook.json
+node scripts/token_check.mjs lorebook.json --model gpt-4o
 ```
 
-Дальше можно попросить Codex использовать skill:
+### Один ключ
 
-```text
-Use ace-skill to improve my SillyTavern bot.
+```bash
+node scripts/st_key_tester.mjs '/(?:Годжо|Gojo)/iu' --text 'Годжо вошёл в комнату'
 ```
 
-Или открыть список skills внутри Codex:
+### Lorebook activation
 
-```text
-/skills
+```bash
+node scripts/st_lorebook_key_check.mjs lorebook.json --text 'Годжо вспоминает мать и прошлое' --char 'Gojo' --user 'User'
 ```
 
 ---
 
-### Claude Code
-
-#### Вариант 1: использовать как обычный проект
+## npm scripts
 
 ```bash
-git clone https://github.com/evrytests-maker/ace-skill.git
-cd ace-skill
-claude
-```
-
-После запуска Claude Code напиши:
-
-```text
-Read SKILL.md and follow ACE-SKILL.
-Help me create, fix, or optimize a SillyTavern character card and lorebook.
-Use references and scripts from this repository.
-```
-
-#### Вариант 2: установить как personal skill
-
-Claude Code использует personal skills из папки:
-
-```text
-~/.claude/skills/
-```
-
-Установка:
-
-```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/evrytests-maker/ace-skill.git ~/.claude/skills/ace-skill
-```
-
-Запуск:
-
-```bash
-claude
-```
-
-После запуска можно вызвать skill напрямую:
-
-```text
-/ace-skill
-```
-
-Или обычным текстом:
-
-```text
-Use ace-skill to fix my SillyTavern bot and lorebook.
-```
-
-#### Вариант 3: установить skill только для одного проекта
-
-Внутри нужного проекта:
-
-```bash
-mkdir -p .claude/skills
-git clone https://github.com/evrytests-maker/ace-skill.git .claude/skills/ace-skill
+npm run validate:bot -- character.json --model gpt-4o
+npm run validate:lorebook -- lorebook.json
+npm run check:key -- '/(?:Годжо|Gojo)/iu' --text 'Годжо здесь'
+npm run check:keys -- lorebook.json --text 'sample scan text'
+npm run check:tokens -- character.json --model gpt-4o
 ```
 
 ---
 
-### Antigravity CLI
+## Новое правило greetings
 
-#### Вариант 1: использовать как обычный проект
+Старое правило 100–200 слов удалено.
 
-```bash
-git clone https://github.com/evrytests-maker/ace-skill.git
-cd ace-skill
-agy
-```
+Теперь:
 
-После запуска Antigravity напиши:
-
-```text
-Read SKILL.md and use ACE-SKILL as the workflow.
-Help me improve a SillyTavern character card, lorebook, World Info entries, regex keys, and JSON.
-```
-
-#### Вариант 2: установить как workspace skill
-
-Для текущего проекта Antigravity использует:
-
-```text
-.agents/skills/
-```
-
-Установка в проект:
-
-```bash
-mkdir -p .agents/skills
-git clone https://github.com/evrytests-maker/ace-skill.git .agents/skills/ace-skill
-```
-
-Запуск:
-
-```bash
-agy
-```
-
-Проверка skills:
-
-```text
-/skills
-```
-
-#### Вариант 3: установить как global skill
-
-Для глобального использования:
-
-```bash
-mkdir -p ~/.gemini/config/skills
-git clone https://github.com/evrytests-maker/ace-skill.git ~/.gemini/config/skills/ace-skill
-```
-
-После этого skill должен быть доступен в разных проектах.
+- `first_mes`: минимум 250 слов;
+- каждое `alternate_greetings`: минимум 250 слов;
+- верхнего лимита по словам нет;
+- если сцена большая, проверяй токен-бюджет.
 
 ---
 
-### ChatGPT
+## JavaScript вместо Python
 
-ChatGPT не устанавливает GitHub-skills автоматически как CLI-агенты.
+Активные скрипты теперь в `scripts/*.mjs`.
 
-Но можно заставить ChatGPT использовать этот skill как рабочую инструкцию.
-
-#### Вариант 1: через GitHub-ссылку
-
-Открой ChatGPT с режимом агента или инструментами для работы с файлами и напиши:
+Python-версии сохранены здесь:
 
 ```text
-Открой этот GitHub-репозиторий:
-
-https://github.com/evrytests-maker/ace-skill
-
-Прочитай SKILL.md.
-Используй ACE-SKILL как инструкцию.
-Мне нужно улучшить SillyTavern-бота, character card, lorebook, World Info, regex-ключи и JSON.
-Сначала задай уточняющие вопросы.
+legacy/python/
 ```
 
-#### Вариант 2: через ZIP
-
-1. Скачай репозиторий как ZIP.
-2. Загрузи ZIP в ChatGPT.
-3. Напиши:
-
-```text
-Распакуй архив.
-Прочитай SKILL.md.
-Используй ACE-SKILL как инструкцию для работы с моим SillyTavern-ботом.
-```
+Их можно использовать только для сравнения или старого workflow. Для SillyTavern regex финальная проверка должна быть JavaScript-based.
 
 ---
 
-## Проверочные скрипты
-
-ACE-SKILL содержит Python-скрипты для проверки результата.
-
-### Проверить lorebook JSON
-
-```bash
-python3 scripts/validate_lorebook_json.py path/to/lorebook.json
-```
-
-Пример:
-
-```bash
-python3 scripts/validate_lorebook_json.py my_lorebook.json
-```
-
-### Проверить character card
-
-```bash
-python3 scripts/validate_bot_description.py path/to/character.json
-```
-
-Пример:
-
-```bash
-python3 scripts/validate_bot_description.py character.json
-```
-
-### Проверить русский regex-ключ
-
-```bash
-python3 scripts/ru_regex_check.py '<REGEX>' --lint --kind word --strategy regex
-```
-
-Пример:
-
-```bash
-python3 scripts/ru_regex_check.py '/(?:^|[^а-яА-ЯёЁ])маг(?:ия|ический|ическое)?(?![а-яА-ЯёЁ])/iu' --lint --kind word --strategy regex
-```
-
----
-
-## Примеры запросов
+## Примеры задач
 
 ```text
-Исправь моего SillyTavern-бота по ACE-SKILL.
+Проверь мой lorebook и исправь ключи под SillyTavern.
 ```
 
 ```text
-Создай lorebook для этого персонажа.
+Сделай отдельный GPT-промпт для этой character card, чтобы ChatGPT не путал Mind и Personality.
 ```
 
 ```text
-Сделай RU/EN ключи для World Info.
+Создай first_mes и 3 alternate_greetings, каждое минимум 250 слов, не пиши за {{user}}.
 ```
 
 ```text
-Сделай русские regex-ключи для этих терминов.
-```
-
-```text
-Проверь character.json и исправь ошибки.
-```
-
-```text
-Оптимизируй first_mes и mes_example.
-```
-
-```text
-Раздели Mind, Personality, Appearance и Scenario.
-```
-
-```text
-Проверь, почему lorebook срабатывает слишком часто.
-```
-
----
-
-## Как агент должен работать
-
-Правильный порядок работы:
-
-1. Прочитать `SKILL.md`.
-2. Понять задачу пользователя.
-3. Задать уточняющие вопросы.
-4. Предложить план.
-5. Исправить описание, lorebook или JSON.
-6. Проверить результат скриптами.
-7. Объяснить, что было изменено.
-
----
-
-## Важные ограничения
-
-- ACE-SKILL не заменяет ручную проверку.
-- Агент может ошибаться в regex и JSON, поэтому результат нужно проверять.
-- Для работы скриптов нужен Python 3.
-- Для CLI-агентов нужны установленные Codex CLI, Claude Code или Antigravity CLI.
-- ChatGPT использует этот репозиторий только если ты явно попросишь открыть ссылку или загрузишь ZIP.
-- Если агент не видит skill, перезапусти CLI или проверь папку установки.
-
----
-
-## Обновление skill
-
-Если skill установлен через `git clone`, обнови его так:
-
-```bash
-cd ~/.agents/skills/ace-skill
-git pull
-```
-
-Для Claude Code:
-
-```bash
-cd ~/.claude/skills/ace-skill
-git pull
-```
-
-Для Antigravity global skill:
-
-```bash
-cd ~/.gemini/config/skills/ace-skill
-git pull
+Проверь, какие записи World Info активируются на этом фрагменте чата.
 ```
 
 ---
 
 ## Лицензия
 
-В репозитории пока нет отдельного `LICENSE` файла.
-
-Если ты хочешь разрешить другим людям свободно использовать и изменять ACE-SKILL, добавь лицензию, например MIT.
-
+MIT или лицензия исходного репозитория, если она задана отдельно.
