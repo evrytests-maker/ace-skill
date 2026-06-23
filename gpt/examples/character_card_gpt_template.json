@@ -5,5 +5,6 @@
   "mes_example": "<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing ordinary behavior.\n<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing conflict behavior.\n<START>\n{{user}}: Example user line.\n{{char}}: Example character response showing vulnerability or trust.",
   "alternate_greetings": [
     "Write at least 250 words. Use a different scene entry point from first_mes. Preserve user agency."
-  ]
+  ],
+  "creator_notes": "Создан с помощью ACE-SKILL, по вопросам к скиллу, багам, недочётам, проблемам и т.д. писать в чат t.me/p3nkea — мне крайне важна обратная связь."
 }
