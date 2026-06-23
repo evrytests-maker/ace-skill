@@ -1,153 +1,127 @@
-# ACE-SKILL v4 GPT/JS
+# ACE-SKILL
 
-**ACE-SKILL** is a skill package for AI agents that create, fix, and optimize SillyTavern character cards, World Info / Lorebooks, activation keys, JavaScript regex keys, greetings, and token budgets.
+**ACE-SKILL** is a set of instructions, templates, and validation tools for creating character cards, lorebooks, and prompts for SillyTavern, ChatGPT, Codex, Claude, Kimi, and other models.
 
-Version v4 adds a dedicated GPT branch and moves active validation scripts to JavaScript/Node. Python is kept as legacy.
+The project helps build cleaner cards and lorebooks: clear structure, working keys, checked lore, long greetings, and separate rules for GPT-based models.
 
----
+## Features
 
-## What changed in v4
+- Create and improve character cards.
+- Create and validate SillyTavern lorebooks.
+- Check lorebook keys with JavaScript logic close to SillyTavern behavior.
+- Estimate text size with a token checker.
+- Use separate rules for GPT, ChatGPT, and Codex.
+- Use a general workflow for Claude, Kimi, Gemini, and other models.
+- Keep old Python scripts in a legacy folder.
 
-- Added `gpt/` for ChatGPT, OpenAI API, Codex, and Custom GPT prompts.
-- `SKILL.md` now routes between the general workflow and GPT workflow.
-- GPT prompts are not automatically applied to Claude/Kimi/Gemini.
-- Key checking now uses Node/JavaScript regex behavior, closer to SillyTavern.
-- Added a universal token checker.
-- `first_mes` and every `alternate_greetings` item must be at least 250 words, with no upper word limit.
-- Old Python scripts moved to `legacy/python/`.
+## How to use
 
----
+### In ChatGPT or another LLM chat
 
-## Structure
+Upload the archive or project files and write:
 
 ```text
-ace-skill/
-├── SKILL.md
-├── README.md
-├── README_EN.md
-├── package.json
-├── assets/
-│   └── lorebook_template.json
-├── gpt/
-│   ├── README_GPT.md
-│   ├── SKILL_GPT.md
-│   ├── prompts/
-│   └── examples/
-├── references/
-├── scripts/
-│   ├── validate_bot_description.mjs
-│   ├── validate_lorebook_json.mjs
-│   ├── st_key_tester.mjs
-│   ├── st_lorebook_key_check.mjs
-│   ├── token_check.mjs
-│   ├── token_model_map.mjs
-│   └── lib/
-├── legacy/
-│   └── python/
-└── tests/
-    └── key-fixtures/
+Use ACE-SKILL.
+Use SKILL.md as the main instruction file.
+If the task is about GPT, ChatGPT, or Codex, use gpt/SKILL_GPT.md.
+If the task is about Claude, Kimi, or Gemini, use the general workflow.
 ```
 
----
+### In Codex or an agent environment
 
-## Quick start
+Use the repository as a skill folder.
+
+Main entry file:
+
+```text
+SKILL.md
+```
+
+For GPT-specific tasks:
+
+```text
+gpt/SKILL_GPT.md
+```
+
+### Locally
+
+Node.js 20 or newer is recommended.
+
+Install dependencies if the project adds any:
 
 ```bash
-git clone https://github.com/evrytests-maker/ace-skill.git
-cd ace-skill
 npm install
 ```
 
-Most scripts work with plain Node.js. The optional dependency in `package.json` can improve OpenAI token counting when installed.
+Run the basic check:
 
-Tell your agent:
+```bash
+npm run check:all
+```
+
+Validate a lorebook:
+
+```bash
+node scripts/validate_lorebook_json.mjs assets/lorebook_template.json
+```
+
+Test one key:
+
+```bash
+node scripts/st_key_tester.mjs '/(?:Gojo|Satoru)/iu' --text 'Gojo entered the room'
+```
+
+Check lorebook keys against a chat sample:
+
+```bash
+node scripts/st_lorebook_key_check.mjs tests/key-fixtures/sample_lorebook.json --chat tests/key-fixtures/sample_chat.txt
+```
+
+Estimate tokens:
+
+```bash
+node scripts/token_check.mjs assets/lorebook_template.json --model gpt-4o
+```
+
+## Project structure
 
 ```text
-Read SKILL.md and use ACE-SKILL.
-I need to improve a SillyTavern character card, lorebook, keys, and JSON.
-If the task targets GPT/ChatGPT/Codex, use gpt/SKILL_GPT.md.
+.
+├── SKILL.md                     # Main rules and task routing
+├── README.md                    # Russian README
+├── README_EN.md                 # English README
+├── assets/                      # Templates
+├── references/                  # Reference materials
+├── gpt/                         # Rules and prompts for GPT, ChatGPT, and Codex
+├── scripts/                     # Active JavaScript validators
+├── scripts/lib/                 # Shared JS modules
+├── legacy/python/               # Old Python scripts
+└── tests/                       # Test fixtures
 ```
 
----
+## Core idea
 
-## GPT mode
+ACE-SKILL separates models by behavior.
 
-Use GPT mode for:
+GPT, ChatGPT, and Codex use the dedicated `gpt/` folder because they need more explicit instructions: roles, inputs, step order, output format, validation rules, and examples.
 
-- ChatGPT;
-- OpenAI API;
-- Custom GPTs;
-- Codex;
-- GPT-specific SillyTavern presets;
-- problems where GPT follows prompts too literally or loses logic.
+Claude, Kimi, Gemini, and other models use the general workflow from `SKILL.md` unless the user explicitly asks for GPT mode.
 
-Agent instruction:
+## Added
 
-```text
-Read SKILL.md. This task targets ChatGPT/Codex, so use gpt/SKILL_GPT.md and gpt/prompts/. Do not apply GPT-only prompts to Claude/Kimi unless I ask.
-```
+- A dedicated `gpt/` folder for GPT, ChatGPT, and Codex.
+- Prompts for character cards, lorebooks, keys, and result validation.
+- JavaScript scripts for active project checks.
+- A Node.js lorebook key tester.
+- A universal token checker.
+- Test fixtures for keys and lorebooks.
+- A 250-word minimum for greetings.
+- Clear routing: GPT uses GPT rules, while other models do not use them unless needed.
 
-Only safe prompt-structure lessons may be taken from third-party GPT presets: modular blocks, length presets, POV boundaries, character blindspot, no-user-control, and plot push. Do not copy jailbreak/no-refusal/filter-bypass instructions.
+## Replaced
 
----
-
-## Validation commands
-
-### Character card
-
-```bash
-node scripts/validate_bot_description.mjs character.json --model gpt-4o
-node scripts/token_check.mjs character.json --model gpt-4o
-```
-
-### Lorebook
-
-```bash
-node scripts/validate_lorebook_json.mjs lorebook.json
-node scripts/token_check.mjs lorebook.json --model gpt-4o
-```
-
-### Single key
-
-```bash
-node scripts/st_key_tester.mjs '/(?:Годжо|Gojo)/iu' --text 'Годжо вошёл в комнату'
-```
-
-### Lorebook activation
-
-```bash
-node scripts/st_lorebook_key_check.mjs lorebook.json --text 'Gojo remembers his mother and past' --char 'Gojo' --user 'User'
-```
-
----
-
-## New greeting rule
-
-The old 100–200 word rule is removed.
-
-Now:
-
-- `first_mes`: minimum 250 words;
-- every `alternate_greetings`: minimum 250 words;
-- no upper word limit;
-- large scenes should be checked against the target token budget.
-
----
-
-## JavaScript instead of Python
-
-Active scripts are now in `scripts/*.mjs`.
-
-Python versions are preserved in:
-
-```text
-legacy/python/
-```
-
-Use them only for legacy comparison. Final SillyTavern regex checks should be JavaScript-based.
-
----
-
-## License
-
-MIT or the original repository license if specified separately.
+- Main Python scripts were replaced with JavaScript scripts.
+- Old Python scripts were moved to `legacy/python/`.
+- README was rewritten into a simpler and clearer format.
+- Key validation is now closer to SillyTavern behavior.
+- The upper word limit for greetings was removed; token-budget checks are used instead.

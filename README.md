@@ -1,192 +1,127 @@
-# ACE-SKILL v4 GPT/JS
+# ACE-SKILL
 
-**ACE-SKILL** — skill-пакет для ИИ-агентов, которые создают, исправляют и оптимизируют SillyTavern character cards, World Info / Lorebooks, ключи активации, JavaScript regex, greetings и token budgets.
+**ACE-SKILL** — это набор инструкций, шаблонов и проверок для создания персонажных карточек, лорбуков и промптов под SillyTavern, ChatGPT, Codex, Claude, Kimi и другие модели.
 
-Версия v4 добавляет отдельную GPT-ветку и переводит активные скрипты на JavaScript/Node. Python оставлен как legacy.
+Проект помогает собрать карточку аккуратно: с понятной структурой, рабочими ключами, проверяемым лором, длинными приветствиями и отдельными правилами для GPT-моделей.
 
----
+## Возможности
 
-## Главное в v4
+- Создание и улучшение персонажных карточек.
+- Создание и проверка лорбуков для SillyTavern.
+- Проверка ключей лорбука через JavaScript-логику, близкую к SillyTavern.
+- Оценка размера текста через токен-чекер.
+- Отдельные правила для GPT, ChatGPT и Codex.
+- Общий workflow для Claude, Kimi, Gemini и других моделей.
+- Legacy-папка со старыми Python-скриптами.
 
-- Добавлена отдельная папка `gpt/` для ChatGPT, OpenAI API, Codex и Custom GPT prompts.
-- Главный `SKILL.md` теперь сам выбирает режим: общий workflow или GPT workflow.
-- GPT-промпты не применяются к Claude/Kimi/Gemini автоматически.
-- Проверка ключей переведена на Node/JavaScript regex, ближе к SillyTavern.
-- Добавлен universal token checker.
-- `first_mes` и каждое `alternate_greetings`: минимум 250 слов, без верхнего лимита по словам.
-- Старые Python-скрипты перенесены в `legacy/python/`.
+## Как использовать
 
----
+### В ChatGPT или другом LLM-чате
 
-## Структура
+Загрузи архив или файлы проекта в чат и напиши:
 
 ```text
-ace-skill/
-├── SKILL.md
-├── README.md
-├── README_EN.md
-├── package.json
-├── assets/
-│   └── lorebook_template.json
-├── gpt/
-│   ├── README_GPT.md
-│   ├── SKILL_GPT.md
-│   ├── prompts/
-│   └── examples/
-├── references/
-│   ├── bot_writing_rules.md
-│   ├── keyword_strategies.md
-│   ├── lorebook_rules.md
-│   ├── prompt_architecture.md
-│   ├── regex_templates.md
-│   ├── ru_regex_checker_agent_prompt.md
-│   └── ru_regex_checker_reference.md
-├── scripts/
-│   ├── validate_bot_description.mjs
-│   ├── validate_lorebook_json.mjs
-│   ├── st_key_tester.mjs
-│   ├── st_lorebook_key_check.mjs
-│   ├── token_check.mjs
-│   ├── token_model_map.mjs
-│   └── lib/
-├── legacy/
-│   └── python/
-└── tests/
-    └── key-fixtures/
+Используй ACE-SKILL.
+Главные правила бери из SKILL.md.
+Если задача касается GPT, ChatGPT или Codex — используй gpt/SKILL_GPT.md.
+Если задача касается Claude, Kimi или Gemini — используй общий workflow.
 ```
 
----
+### В Codex или агентной среде
 
-## Быстрый старт
+Используй репозиторий как skill-папку.
+
+Главный входной файл:
+
+```text
+SKILL.md
+```
+
+Для GPT-специфичных задач:
+
+```text
+gpt/SKILL_GPT.md
+```
+
+### Локально
+
+Нужен Node.js 20 или новее.
+
+Установить зависимости, если они появятся в проекте:
 
 ```bash
-git clone https://github.com/evrytests-maker/ace-skill.git
-cd ace-skill
 npm install
 ```
 
-Минимально `npm install` не обязателен для большинства проверок, потому что скрипты используют стандартный Node.js. Для более точного OpenAI token count можно установить optional dependency из `package.json`.
-
-Попроси агента:
-
-```text
-Прочитай SKILL.md и используй ACE-SKILL.
-Мне нужно улучшить SillyTavern character card, lorebook, ключи и JSON.
-Если задача про GPT/ChatGPT/Codex — используй gpt/SKILL_GPT.md.
-```
-
----
-
-## GPT режим
-
-Используй GPT-режим, если работаешь с:
-
-- ChatGPT;
-- OpenAI API;
-- Custom GPT;
-- Codex;
-- GPT-specific SillyTavern preset;
-- проблемами, где GPT слишком буквально понимает промпт.
-
-Команда для агента:
-
-```text
-Read SKILL.md. This task targets ChatGPT/Codex, so use gpt/SKILL_GPT.md and gpt/prompts/. Do not apply GPT-only prompts to Claude/Kimi unless I ask.
-```
-
-Из сторонних GPT-пресетов можно брать только безопасные правила структуры промптов: модульность, length presets, POV boundaries, character blindspot, no-user-control, plot push. Не переносить jailbreak/no-refusal/filter-bypass инструкции.
-
----
-
-## Проверочные команды
-
-### Character card
+Запустить базовую проверку:
 
 ```bash
-node scripts/validate_bot_description.mjs character.json --model gpt-4o
-node scripts/token_check.mjs character.json --model gpt-4o
+npm run check:all
 ```
 
-### Lorebook
+Проверить лорбук:
 
 ```bash
-node scripts/validate_lorebook_json.mjs lorebook.json
-node scripts/token_check.mjs lorebook.json --model gpt-4o
+node scripts/validate_lorebook_json.mjs assets/lorebook_template.json
 ```
 
-### Один ключ
+Проверить один ключ:
 
 ```bash
 node scripts/st_key_tester.mjs '/(?:Годжо|Gojo)/iu' --text 'Годжо вошёл в комнату'
 ```
 
-### Lorebook activation
+Проверить ключи лорбука на тексте чата:
 
 ```bash
-node scripts/st_lorebook_key_check.mjs lorebook.json --text 'Годжо вспоминает мать и прошлое' --char 'Gojo' --user 'User'
+node scripts/st_lorebook_key_check.mjs tests/key-fixtures/sample_lorebook.json --chat tests/key-fixtures/sample_chat.txt
 ```
 
----
-
-## npm scripts
+Проверить токены:
 
 ```bash
-npm run validate:bot -- character.json --model gpt-4o
-npm run validate:lorebook -- lorebook.json
-npm run check:key -- '/(?:Годжо|Gojo)/iu' --text 'Годжо здесь'
-npm run check:keys -- lorebook.json --text 'sample scan text'
-npm run check:tokens -- character.json --model gpt-4o
+node scripts/token_check.mjs assets/lorebook_template.json --model gpt-4o
 ```
 
----
-
-## Новое правило greetings
-
-Старое правило 100–200 слов удалено.
-
-Теперь:
-
-- `first_mes`: минимум 250 слов;
-- каждое `alternate_greetings`: минимум 250 слов;
-- верхнего лимита по словам нет;
-- если сцена большая, проверяй токен-бюджет.
-
----
-
-## JavaScript вместо Python
-
-Активные скрипты теперь в `scripts/*.mjs`.
-
-Python-версии сохранены здесь:
+## Структура проекта
 
 ```text
-legacy/python/
+.
+├── SKILL.md                     # Главные правила и маршрутизация задач
+├── README.md                    # Описание на русском
+├── README_EN.md                 # Описание на английском
+├── assets/                      # Шаблоны
+├── references/                  # Справочные материалы
+├── gpt/                         # Правила и промпты для GPT, ChatGPT и Codex
+├── scripts/                     # Активные JavaScript-проверки
+├── scripts/lib/                 # Общие JS-модули
+├── legacy/python/               # Старые Python-скрипты
+└── tests/                       # Тестовые фикстуры
 ```
 
-Их можно использовать только для сравнения или старого workflow. Для SillyTavern regex финальная проверка должна быть JavaScript-based.
+## Логика работы
 
----
+ACE-SKILL разделяет модели по поведению.
 
-## Примеры задач
+GPT, ChatGPT и Codex используют отдельную папку `gpt/`, потому что им нужны более явные инструкции: роли, входные данные, порядок действий, формат вывода, проверки и примеры.
 
-```text
-Проверь мой lorebook и исправь ключи под SillyTavern.
-```
+Claude, Kimi, Gemini и другие модели используют общий workflow из `SKILL.md`, если пользователь не просит GPT-режим явно.
 
-```text
-Сделай отдельный GPT-промпт для этой character card, чтобы ChatGPT не путал Mind и Personality.
-```
+## Что добавили
 
-```text
-Создай first_mes и 3 alternate_greetings, каждое минимум 250 слов, не пиши за {{user}}.
-```
+- Отдельную папку `gpt/` для GPT, ChatGPT и Codex.
+- Промпты для создания карточек, лорбуков, ключей и проверки результата.
+- JavaScript-скрипты для активной проверки проекта.
+- Node.js-проверку ключей лорбука.
+- Универсальный токен-чекер.
+- Тестовые фикстуры для ключей и лорбуков.
+- Минимум 250 слов для приветствий.
+- Явную маршрутизацию: GPT использует GPT-правила, остальные модели не берут их без причины.
 
-```text
-Проверь, какие записи World Info активируются на этом фрагменте чата.
-```
+## Что заменили
 
----
-
-## Лицензия
-
-MIT или лицензия исходного репозитория, если она задана отдельно.
+- Основные Python-скрипты заменены на JavaScript.
+- Старые Python-скрипты перенесены в `legacy/python/`.
+- README переписан в более простой и понятный формат.
+- Проверка ключей стала ближе к поведению SillyTavern.
+- Верхний лимит по словам в приветствиях убран; вместо него используется проверка токен-бюджета.
