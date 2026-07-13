@@ -1,0 +1,18 @@
+{
+  "lorebook": {
+    "entries": [
+      { "uid": 1, "key": ["gate"], "content": "The gate reveals a sigil called ember.", "order": 200, "probability": 100, "useProbability": true },
+      { "uid": 2, "key": ["ember"], "content": "The ember sigil opens the archive.", "order": 150, "group": "route", "groupWeight": 1 },
+      { "uid": 3, "key": ["ember"], "content": "The ember sigil opens the cellar.", "order": 150, "group": "route", "groupWeight": 3 },
+      { "uid": 4, "constant": true, "content": "This disabled fact must never appear.", "disable": true },
+      { "uid": 5, "vectorized": true, "content": "Mira catalogues the star maps.", "characterFilter": ["Mira"], "sticky": 1 }
+    ],
+    "settings": { "recursiveScanning": true, "maxRecursionDepth": 3, "tokenBudget": 40 }
+  },
+  "history": [{ "role": "user", "content": "Open the gate" }],
+  "character": { "name": "Mira", "description": "An archivist" },
+  "persona": { "name": "Traveler" },
+  "generationType": "normal",
+  "messageNumber": 1,
+  "seed": "combined-conflicts"
+}

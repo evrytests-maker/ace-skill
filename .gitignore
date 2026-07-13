@@ -1,0 +1,6 @@
+setup_ace_skill.sh
+rewrite_ace_readme.sh
+node_modules/
+.ace-reports/
+.venv/
+coverage/

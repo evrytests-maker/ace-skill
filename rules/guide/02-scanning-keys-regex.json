@@ -1,0 +1,382 @@
+{
+  "id": "scanning-keys-regex",
+  "title": "Scanning, keys, selective logic, and regex",
+  "loadWhen": [
+    "testing key activation",
+    "resolving scan buffers",
+    "auditing regex"
+  ],
+  "agentPrompt": "Build the exact per-entry scan buffer with provenance, then evaluate plaintext, selective, and JavaScript-regex keys using resolved global and entry settings. Record matched spans and fail closed on invalid or hazardous regex.",
+  "rules": [
+    {
+      "id": "G-SCAN-001",
+      "action": "Verify that scan depth counts completed messages from the end and an entry override supersedes the global value.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Scan Depth",
+        "locator": "lines 859-917"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "scanSegmentProvenance",
+        "resolvedSetting"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-SCAN-002",
+      "action": "Verify that scan depth zero disables ordinary chat-key scanning without disabling unrelated activation paths.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global and entry activation settings",
+        "locator": "lines 197-234, 859-917"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "scanSegmentProvenance",
+        "resolvedSetting"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-SCAN-003",
+      "action": "Verify that include Names changes the actual scan buffer and its provenance.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Include Names",
+        "locator": "lines 197-219"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "scanSegmentProvenance",
+        "resolvedSetting"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-SCAN-004",
+      "action": "Verify that configured additional scan sources contribute real, provenance-labelled segments or a justified N/A/BLOCKED result.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Additional scan sources",
+        "locator": "lines 1401-1410"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "scanSegmentProvenance",
+        "resolvedSetting"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-SCAN-005",
+      "action": "Verify that global scan settings and entry overrides resolve explicitly for every entry.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global and entry activation settings",
+        "locator": "lines 859-1038"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "scanSegmentProvenance",
+        "resolvedSetting"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-001",
+      "action": "Verify that primary keys are matched against the assembled scan buffer with matched-span evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Primary keys and additional filters",
+        "locator": "lines 686-729"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-002",
+      "action": "Verify that plain-key case sensitivity follows the resolved case setting.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Case sensitivity",
+        "locator": "lines 918-949"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-003",
+      "action": "Use the release-code whole-word matcher: single-word plaintext keys use JavaScript \\W-style boundaries; multi-word keys use literal sequence matching. Do not claim Unicode-aware boundaries.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Whole words",
+        "locator": "lines 950-959"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-004",
+      "action": "Verify that plain multi-word keys require their literal sequence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Primary keys and additional filters",
+        "locator": "lines 697-713"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-005",
+      "action": "Verify that selective logic uses numeric truth table 0 AND_ANY, 1 NOT_ALL, 2 NOT_ANY, 3 AND_ALL.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Primary keys and additional filters",
+        "locator": "lines 821-858"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-KEY-006",
+      "action": "Verify that non-empty secondary keys in audited output require selective activation and cannot be silently ignored.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Primary keys and additional filters",
+        "locator": "lines 821-858"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "matchedSpan"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REGEX-001",
+      "action": "Verify that regex keys compile with JavaScript syntax and control their own flags and boundaries.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Regex keys and JavaScript regular expressions",
+        "locator": "lines 730-739, 1415-1442"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "regexEngineResult"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-LORE-VALIDATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REGEX-002",
+      "action": "Verify that russian regex keys cover declared morphology while rejecting derivational near-misses.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Regex keys and JavaScript regular expressions",
+        "locator": "lines 740-820, 1443-1482"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "regexEngineResult"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-LORE-VALIDATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REGEX-003",
+      "action": "Verify that regex keys must not empty-match or exhibit an unbounded performance hazard.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Regex keys and JavaScript regular expressions",
+        "locator": "lines 1450-1482"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "regexEngineResult"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-LORE-VALIDATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REGEX-004",
+      "action": "Verify that hTML, CSS, and reasoning text can trigger scan keys unless runtime preprocessing removes them.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "HTML/CSS/reasoning scan caveat",
+        "locator": "lines 714-719"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "regexEngineResult"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-MATCHER",
+        "M-LORE-VALIDATOR",
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    }
+  ]
+}

@@ -1,0 +1,400 @@
+{
+  "id": "placement-probability-budget",
+  "title": "Placement, outlets, probability, budget, and pipeline",
+  "loadWhen": [
+    "assembling prompts",
+    "testing outlets",
+    "checking probability or budget"
+  ],
+  "agentPrompt": "Run eligible candidates through probability and token budget, then assemble only supported prompt positions. Keep Outlet entries out of automatic insertion and never present simulated prompt output as observed runtime evidence.",
+  "rules": [
+    {
+      "id": "G-PLACE-001",
+      "action": "Verify that before/after-character positions resolve to distinct prompt slots.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 568-580"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-002",
+      "action": "Verify that before/after-example positions resolve to distinct prompt slots.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 568-580"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-003",
+      "action": "Verify that before/after-Author's-Note positions resolve relative to the actual Author's Note configuration.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 594-601"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-004",
+      "action": "Verify that at-depth position inserts into chat history at the resolved depth.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 581-593"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-005",
+      "action": "Verify that at-depth placement preserves the configured system, user, or assistant role.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 581-593"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-006",
+      "action": "Verify that author's Note placement respects disabled or zero-frequency Author's Note state.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and insertion position",
+        "locator": "lines 594-601"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-007",
+      "action": "Keep Outlet entries out of automatic prompt insertion. Require a non-empty case-sensitive Outlet Name, preserve descending Order and newline joining, and expand content only in supported consumers where the outlet macro identifier is case-insensitive but the captured name is case-sensitive.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Outlet position",
+        "locator": "lines 602-643"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "covered",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-PLACE-008",
+      "action": "Verify that order sorting is deterministic; claims about model influence remain qualified.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Priority and order",
+        "locator": "lines 644-667"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PLACE-009",
+      "action": "Verify that simulated prompt evidence is never represented as observed runtime raw-prompt evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection",
+        "locator": "lines 378-397"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "resolvedPromptSlot",
+        "provenance"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PROB-001",
+      "action": "Verify that probability uses the injected seed; 0 never passes and 100 always passes.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Activation probability",
+        "locator": "lines 668-685"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "seed",
+        "roll",
+        "threshold"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-BUDGET-001",
+      "action": "Verify that token accounting records budget before/after and never produces a negative remaining budget.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global budget and Ignore Budget",
+        "locator": "lines 197-234, 1159-1176"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "tokenCount",
+        "budgetBefore",
+        "budgetAfter"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-BUDGET-002",
+      "action": "Verify that ignoreBudget is an explicit budget override and does not bypass unrelated filters.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global budget and Ignore Budget",
+        "locator": "lines 1159-1176"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "tokenCount",
+        "budgetBefore",
+        "budgetAfter"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-BUDGET-003",
+      "action": "Verify that budget and order precedence follows the pinned pipeline and requires runtime qualification where ambiguous.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global budget and Ignore Budget",
+        "locator": "lines 197-234, 644-667, 1159-1176"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "tokenCount",
+        "budgetBefore",
+        "budgetAfter"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-PIPE-001",
+      "action": "Verify that every simulation records the formal pipeline stage order.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Guide-wide activation and insertion pipeline",
+        "locator": "lines 197-232, 440-1411, 1680-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "stageTrace",
+        "invariantResults"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-PIPE-002",
+      "action": "Verify that pipeline invariants guarantee termination, non-negative budget, no disabled insertion, and coherent statuses.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Guide-wide activation and insertion pipeline",
+        "locator": "lines 197-232, 440-1411, 1680-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "stageTrace",
+        "invariantResults"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE"
+      ],
+      "verification": "automatic"
+    }
+  ]
+}

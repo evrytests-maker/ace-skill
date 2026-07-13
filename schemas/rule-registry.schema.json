@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ace/rule-registry.schema.json",
+  "type": "object",
+  "required": ["version", "validators", "rules"],
+  "properties": {
+    "version": { "type": "string" },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "command"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^VAL-[A-Z0-9-]+$" },
+          "path": { "type": "string" },
+          "command": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "level", "scope", "trigger", "action", "success", "failure", "gate", "tests", "sources", "priority", "conflictResolution", "correctiveAction", "naAllowed"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^ACE-[A-Z]+-[0-9]{3}$" },
+          "text": { "type": "string", "minLength": 1 },
+          "level": { "enum": ["MUST", "SHOULD", "MAY", "JUDGMENT"] },
+          "classification": { "enum": ["ADVISORY"] },
+          "scope": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "trigger": { "type": "string", "minLength": 1 },
+          "action": { "type": "string", "minLength": 1 },
+          "success": { "type": "string", "minLength": 1 },
+          "failure": { "type": "string", "minLength": 1 },
+          "gate": {
+            "type": "object",
+            "required": ["kind", "id"],
+            "properties": { "kind": { "enum": ["automatic", "manual"] }, "id": { "type": "string" } },
+            "additionalProperties": false
+          },
+          "tests": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "sources": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "conflictResolution": { "type": "string", "minLength": 1 },
+          "correctiveAction": { "type": "string", "minLength": 1 },
+          "naAllowed": { "type": "boolean" },
+          "naWhen": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

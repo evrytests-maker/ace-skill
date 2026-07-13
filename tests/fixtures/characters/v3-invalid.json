@@ -1,0 +1,11 @@
+{
+  "spec": "chara_card_v3",
+  "spec_version": "3.0",
+  "data": {
+    "name": "Broken V3",
+    "description": {},
+    "first_mes": [],
+    "mes_example": false,
+    "group_only_greetings": "not-an-array"
+  }
+}

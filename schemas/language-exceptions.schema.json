@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "categoryReasons", "categoryPaths", "exceptions"],
+  "properties": {
+    "version": { "const": "5.0.0" },
+    "categoryReasons": {
+      "type": "object",
+      "required": ["regex-literal", "key-literal", "test-string", "source-path", "ui-literal"],
+      "properties": {
+        "regex-literal": { "type": "string", "minLength": 1 },
+        "key-literal": { "type": "string", "minLength": 1 },
+        "test-string": { "type": "string", "minLength": 1 },
+        "source-path": { "type": "string", "minLength": 1 },
+        "ui-literal": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "categoryPaths": {
+      "type": "object",
+      "required": ["regex-literal", "key-literal", "test-string", "source-path", "ui-literal"],
+      "properties": {
+        "regex-literal": { "$ref": "#/$defs/pathPatterns" },
+        "key-literal": { "$ref": "#/$defs/pathPatterns" },
+        "test-string": { "$ref": "#/$defs/pathPatterns" },
+        "source-path": { "$ref": "#/$defs/pathPatterns" },
+        "ui-literal": { "$ref": "#/$defs/pathPatterns" }
+      },
+      "additionalProperties": false
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "line", "sha256", "category"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "line": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "category": { "enum": ["regex-literal", "key-literal", "test-string", "source-path", "ui-literal"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "pathPatterns": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 3 }
+    }
+  },
+  "additionalProperties": false
+}

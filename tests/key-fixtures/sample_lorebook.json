@@ -1,0 +1,33 @@
+{
+  "name": "sample",
+  "entries": [
+    {
+      "id": 0,
+      "keys": [],
+      "secondary_keys": [],
+      "comment": "WORLD | Sample",
+      "content": "This sample world entry is always active and exists only to test validation.",
+      "constant": true,
+      "selective": false,
+      "insertion_order": 100,
+      "enabled": true,
+      "position": "after_char",
+      "use_regex": false,
+      "extensions": { "depth": 1, "selectiveLogic": 0 }
+    },
+    {
+      "id": 1,
+      "keys": ["/(?:Годжо|Gojo|Satoru\\s+Gojo)/iu"],
+      "secondary_keys": [],
+      "comment": "NPC Detail | Gojo",
+      "content": "Gojo is a major NPC. When he appears, describe his evasive humor, sharp perception, and tendency to hide serious emotions behind jokes.",
+      "constant": false,
+      "selective": false,
+      "insertion_order": 140,
+      "enabled": true,
+      "position": "after_char",
+      "use_regex": true,
+      "extensions": { "depth": 4, "selectiveLogic": 0 }
+    }
+  ]
+}

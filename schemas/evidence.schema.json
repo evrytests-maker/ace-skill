@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["runId", "repoHead", "workflowId", "startedAt", "finishedAt", "inputs", "transitions", "references", "gates", "overallStatus"],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "repoHead": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|UNAVAILABLE)$" },
+    "revisionKind": { "enum": ["git", "snapshot", "unavailable"] },
+    "workflowId": { "type": "string", "minLength": 1 },
+    "artifactType": { "enum": ["character", "lorebook"] },
+    "startedAt": { "type": "string" }, "finishedAt": { "type": "string" },
+    "inputs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "transitions": { "type": "array", "items": { "type": "string" } },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["path", "sha256", "evidence"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "evidence": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["gateId", "ruleIds", "kind", "status", "evidence"],
+        "properties": {
+          "gateId": { "type": "string" }, "ruleIds": { "type": "array", "items": { "type": "string" } },
+          "kind": { "enum": ["automatic", "manual"] }, "status": { "enum": ["PASS", "FAIL", "N/A", "BLOCKED"] },
+          "command": { "type": "string" }, "cwd": { "type": "string" }, "exitCode": { "type": "integer" },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "sha256"],
+              "properties": { "path": { "type": "string" }, "sha256": { "type": "string" } },
+              "additionalProperties": false
+            }
+          }, "evidence": { "type": "string" }, "naReason": { "type": "string" },
+          "reviewerRunId": { "type": "string" },
+          "reviewEvidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["criterion", "evidence"],
+              "properties": { "criterion": { "type": "string" }, "evidence": { "type": "string" } },
+              "additionalProperties": false
+            }
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["at", "exitCode", "stdout", "stderr"],
+              "properties": {
+                "at": { "type": "string" }, "exitCode": { "type": "integer" },
+                "stdout": { "type": "string" }, "stderr": { "type": "string" },
+                "spawnError": { "type": ["string", "null"] }
+              },
+              "additionalProperties": true
+            }
+          }, "correction": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "overallStatus": { "enum": ["PASS", "FAIL", "BLOCKED"] }
+  },
+  "additionalProperties": true
+}

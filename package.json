@@ -1,0 +1,50 @@
+{
+  "name": "ace-skill",
+  "version": "5.0.0",
+  "description": "Fail-closed validation and authoring workflows for SillyTavern character cards, World Info, lorebooks, keys, and token budgets.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "validate:bot": "node scripts/ace.mjs validate card",
+    "validate:lorebook": "node scripts/ace.mjs validate lorebook",
+    "validate:style": "node scripts/ace.mjs validate style",
+    "check:keys": "node scripts/ace.mjs lorebook-keys",
+    "check:key": "node scripts/ace.mjs key",
+    "check:tokens": "node scripts/ace.mjs tokens",
+    "check:secondary": "node scripts/ace.mjs secondary",
+    "check:syntax": "node scripts/ace.mjs repo syntax",
+    "check:rules": "node scripts/ace.mjs validate rules",
+    "check:docs": "node scripts/ace.mjs validate docs",
+    "check:sources": "node scripts/ace.mjs validate sources",
+    "check:language": "node scripts/ace.mjs validate language",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:sabotage": "node --test tests/sabotage/*.test.mjs",
+    "test:e2e": "node --test tests/e2e/*.test.mjs",
+    "evals:triggers": "node scripts/ace.mjs eval triggers",
+    "evals:behavior": "node scripts/ace.mjs eval behavior",
+    "evals:all": "node scripts/ace.mjs eval all",
+    "evals:validate": "node evals/run-evals.mjs --suite all --validate-data",
+    "check:external": "node scripts/ace.mjs eval all",
+    "check:fast": "node scripts/ace.mjs repo fast",
+    "check:all": "node scripts/ace.mjs repo all",
+    "check:web": "node verify.mjs",
+    "check:local": "node scripts/ace.mjs repo fast",
+    "check:runtime": "node scripts/ace.mjs eval all"
+  },
+  "keywords": [
+    "sillytavern",
+    "character-card",
+    "lorebook",
+    "world-info",
+    "agent-skill",
+    "validation"
+  ],
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "gpt-tokenizer": "2.9.0",
+    "yaml": "2.9.0"
+  }
+}

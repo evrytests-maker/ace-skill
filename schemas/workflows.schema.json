@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "states", "maxRepairCycles", "workflows"],
+  "properties": {
+    "version": { "type": "string" },
+    "states": { "type": "array", "items": { "type": "string" } },
+    "maxRepairCycles": { "type": "integer", "minimum": 1 },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "trigger", "inputs", "requiredReferences", "forbiddenReferences", "rules", "validators", "manualGates", "outputs", "completeWhen"],
+        "properties": {
+          "id": { "type": "string" }, "trigger": { "type": "string" },
+          "inputs": { "type": "array", "items": { "type": "string" } },
+          "requiredReferences": { "type": "array", "items": { "type": "string" } },
+          "forbiddenReferences": { "type": "array", "items": { "type": "string" } },
+          "referenceCases": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "required": ["requiredReferences", "forbiddenReferences"],
+              "properties": {
+                "requiredReferences": { "type": "array", "items": { "type": "string" } },
+                "forbiddenReferences": { "type": "array", "items": { "type": "string" } }
+              },
+              "additionalProperties": false
+            }
+          },
+          "rules": { "type": "array", "items": { "type": "string" } },
+          "validators": { "type": "array", "items": { "type": "string" } },
+          "manualGates": { "type": "array", "items": { "type": "string" } },
+          "outputs": { "type": "array", "items": { "type": "string" } },
+          "completeWhen": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

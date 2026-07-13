@@ -1,0 +1,82 @@
+{
+  "version": "5.0.0",
+  "gates": [
+    {
+      "id": "MG-CARD-CHARACTERIZATION",
+      "question": "Do the final fields demonstrate motivation through behavior and distinguish inner state from outward manner where relevant?",
+      "appliesWhen": "Character prose is created or materially changed.",
+      "passCriteria": ["At least one concrete field passage connects motivation to a choice, reaction, or recurring behavior.", "Inner motivation and outward behavior remain consistent across every present in-scope card field.", "Central traits do not contradict the requested premise without an explicit, coherent reason.", "Any claimed runtime behavior is supported by representative test turns; unavailable runtime validation is reported as BLOCKED rather than PASS."],
+      "failCriteria": ["Only adjective or goal lists are present without behavioral consequences.", "Backstory, motives, greetings, examples, and behavior contradict each other."],
+      "examples": ["FAIL: 'brave' is listed while every provided behavior is unexplained avoidance."],
+      "requiredEvidence": ["Field path and excerpt for motivation.", "Field path and excerpt for outward behavior.", "List every present in-scope prose field reviewed for consistency.", "Runtime transcript with model/preset, tested greeting, and representative turns, or a concrete BLOCKED reason when runtime behavior is claimed."],
+      "naAllowed": true,
+      "naWhen": "No character prose is in scope."
+    },
+    {
+      "id": "MG-CARD-GREETING",
+      "question": "Does each in-scope greeting provide a playable opening without choosing the user's thoughts, speech, or decisions?",
+      "appliesWhen": "A first or alternate greeting is created or changed.",
+      "passCriteria": ["Every in-scope greeting establishes an immediate place or situation and demonstrates character action or speech.", "Every in-scope greeting gives the user something to respond to and leaves the response open.", "Any user facts are established constraints, not invented intent."],
+      "failCriteria": ["The greeting makes the user agree, speak, feel, or complete an unrequested action."],
+      "examples": ["FAIL: '{{user}} agrees and confesses their love.'", "PASS: '{{char}} offers the letter and waits for {{user}}'s answer.'"],
+      "requiredEvidence": ["Field path or array index for every reviewed greeting.", "Quote each final opening beat or playable handoff.", "Explain how user agency remains open in each greeting."],
+      "naAllowed": true,
+      "naWhen": "No greeting is in scope."
+    },
+    {
+      "id": "MG-CARD-VOICE",
+      "question": "Do the final dialogue examples demonstrate the requested voice or behavioral modes without contradicting the card?",
+      "appliesWhen": "Dialogue examples are created or changed.",
+      "passCriteria": ["Evidence identifies the intended voice and maps each claimed behavior mode to a final excerpt.", "Examples remain consistent with motivation and do not encode events as required chat history.", "Coverage is sufficient for the requested behavior; no universal exact count or template is required."],
+      "failCriteria": ["Examples are interchangeable generic prose.", "Examples encode a conflicting personality or user control."],
+      "examples": ["FAIL: all examples use the same neutral voice despite a requested formal/public versus anxious/private contrast."],
+      "requiredEvidence": ["Field path and representative lines for every claimed mode.", "State how examples preserve user agency and card consistency."],
+      "naAllowed": true,
+      "naWhen": "No dialogue examples are in scope."
+    },
+    {
+      "id": "MG-LORE-SEMANTICS",
+      "question": "Is each changed entry understandable when activated and limited to the information needed for its purpose?",
+      "appliesWhen": "Lorebook entry content is created or changed.",
+      "passCriteria": ["The subject is identifiable from content.", "Unrelated encyclopedia material is absent.", "Length is justified by the actual budget and purpose."],
+      "failCriteria": ["The content depends on an unstated subject.", "Several unrelated topics are packed into one entry."],
+      "examples": ["FAIL: 'She lives there and hates them' without identifying she/there/them."],
+      "requiredEvidence": ["Entry ID and content excerpt.", "One-sentence statement of entry purpose."],
+      "naAllowed": true,
+      "naWhen": "No entry content is in scope."
+    },
+    {
+      "id": "MG-LORE-KEYS",
+      "question": "Do the changed keys identify the entry subject in expected chat language without obvious broad false activations?",
+      "appliesWhen": "Keys are created or changed.",
+      "passCriteria": ["Keys and aliases are semantically connected to content.", "Positive and negative examples cover likely collisions.", "Every requested target language has at least one positive case."],
+      "failCriteria": ["A generic key such as 'the' or 'school' activates unrelated content without a filter.", "The subject's requested RU/EN aliases are absent."],
+      "examples": ["FAIL: key 'city' for one named city without a secondary filter or proper name."],
+      "requiredEvidence": ["Entry ID, key list, one positive case, and one meaningful negative case."],
+      "naAllowed": true,
+      "naWhen": "No keys are in scope."
+    },
+    {
+      "id": "MG-STYLE-CONTRAST",
+      "question": "Is every in-scope prose field free of semantic replacement-by-negation, including split-sentence, mirrored-subject, metaphorical, and translated equivalents?",
+      "appliesWhen": "Character-card or lorebook prose is created, rewritten, or audited.",
+      "passCriteria": ["The prose states intended traits and facts directly.", "No passage denies one label or frame merely to replace it with a more dramatic label or frame."],
+      "failCriteria": ["A passage follows the meaning of 'X is not A; X is B' even when punctuation or wording evades VAL-STYLE.", "A translated or split-sentence equivalent performs the same denial-then-replacement move."],
+      "examples": ["FAIL: 'She is no ordinary archivist. She is the archive's final lock.' PASS: 'She serves as the archive's final lock.'"],
+      "requiredEvidence": ["List every reviewed prose field or entry ID.", "Quote enough of each suspected passage to prove it was removed or state that no semantic equivalent remains."],
+      "naAllowed": true,
+      "naWhen": "No character or lorebook prose is created, changed, or audited."
+    },
+    {
+      "id": "MG-COMBINED-SEPARATION",
+      "question": "Did character and lorebook artifacts receive separate references, applicable rules, validators, manual gates, and evidence?",
+      "appliesWhen": "The workflow is combined-repair.",
+      "passCriteria": ["Both domain result sets are present.", "Neither domain cites a forbidden reference as its quality authority."],
+      "failCriteria": ["One artifact inherits PASS from the other.", "Character style rules are applied to lorebook content or vice versa."],
+      "examples": ["FAIL: a valid card validator result is used to claim the embedded lorebook keys work."],
+      "requiredEvidence": ["Separate card and lorebook gate IDs and result summaries."],
+      "naAllowed": true,
+      "naWhen": "The workflow is not combined-repair."
+    }
+  ]
+}

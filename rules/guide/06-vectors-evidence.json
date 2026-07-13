@@ -1,0 +1,351 @@
+{
+  "id": "vectors-evidence",
+  "title": "Vector retrieval and evidence boundaries",
+  "loadWhen": [
+    "testing Vector Storage",
+    "classifying evidence",
+    "claiming PASS/BLOCKED/N/A"
+  ],
+  "agentPrompt": "Validate Vector Storage gates and numeric settings before retrieval. Pass vector candidates through the normal pipeline and keep structural, simulation, semantic, manual, and runtime evidence separate.",
+  "rules": [
+    {
+      "id": "G-VEC-001",
+      "action": "Verify that vector retrieval uses a provider interface; fake-provider evidence is not real-runtime evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Vector Storage",
+        "locator": "lines 1483-1599, 1632-1655"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-VEC-002",
+      "action": "Permit vector candidates only when Vector Storage and World Info matching are enabled and either the entry is Vectorized or Enabled for all entries is active.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Vector Storage",
+        "locator": "lines 1679-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-VEC-003",
+      "action": "Verify that vector Query Messages is independent of ordinary keyword Scan Depth.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Query Messages",
+        "locator": "lines 1656-1667"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-VEC-004",
+      "action": "Reject invalid vector settings; require integer Query Messages and Max Entries at or above zero and a finite score threshold from 0 through 1; sort ties deterministically.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Score Threshold and Max Entries",
+        "locator": "lines 1668-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-VEC-005",
+      "action": "Verify that expected and unwanted semantic matches require provider-backed evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Vector retrieval control caveat",
+        "locator": "lines 1615-1631"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-VEC-006",
+      "action": "Verify that retrieved vector candidates continue through filters, groups, probability, budget, and timed effects.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Vector Storage",
+        "locator": "lines 438-543, 1679-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-VEC-007",
+      "action": "Verify that embedding truncation is not insertion-content truncation and short entries are not assumed merged.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Vectorization caveats qualified by pinned source",
+        "locator": "lines 1600-1614"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "providerKind",
+        "queryWindow",
+        "score",
+        "originalContent"
+      ],
+      "status": "REJECTED",
+      "authority": "pinned-source-correction",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "rejected-claim"
+    },
+    {
+      "id": "G-EVID-001",
+      "action": "Verify that coverage forms a closed source-to-rule-to-mechanism-to-case-to-evidence graph.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 378-397 and examples throughout"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-EVID-002",
+      "action": "Verify that every applicable entry and field has UID/index and field-path evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 418-1411"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-EVID-003",
+      "action": "Verify that structural, simulation, semantic, manual, and runtime results remain separate and aggregate fail closed.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 253-397, 418-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-EVID-004",
+      "action": "Verify that every N/A has a machine-checkable applicability reason.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 197-232, 440-1694"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-EVID-005",
+      "action": "Verify that advanced fields automatically require the advanced evidence workflow.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 545-1411"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-EVID-006",
+      "action": "Verify that combined card and lorebook work receives separate validation and cross-artifact consistency evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Raw prompt inspection and verification examples",
+        "locator": "lines 65-195"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "evidenceChain"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-EVIDENCE",
+        "M-MANUAL",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    }
+  ]
+}

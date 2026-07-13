@@ -1,0 +1,23 @@
+{
+  "runId": "fixture-invalid-001",
+  "repoHead": "48a8812b75e17145cc5ec66179d3e3b4ad96980e",
+  "workflowId": "key-regex-test",
+  "startedAt": "2026-07-10T12:00:00.000Z",
+  "finishedAt": "2026-07-10T12:00:01.000Z",
+  "inputs": ["negative evidence fixture"],
+  "transitions": ["DISCOVER", "CLASSIFY", "LOAD", "PLAN", "EXECUTE", "VALIDATE", "VERIFY", "REPORT"],
+  "references": [],
+  "gates": [
+    {
+      "gateId": "VAL-KEY",
+      "ruleIds": ["ACE-KEY-001"],
+      "kind": "automatic",
+      "status": "FAIL",
+      "command": "node scripts/ace.mjs key",
+      "cwd": "/workspace/ace-skill",
+      "exitCode": 1,
+      "evidence": "A required negative case matched."
+    }
+  ],
+  "overallStatus": "PASS"
+}

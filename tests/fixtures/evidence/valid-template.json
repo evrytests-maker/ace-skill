@@ -1,0 +1,67 @@
+{
+  "runId": "fixture-pass-001",
+  "repoHead": "48a8812b75e17145cc5ec66179d3e3b4ad96980e",
+  "workflowId": "key-regex-test",
+  "startedAt": "2026-07-10T12:00:00.000Z",
+  "finishedAt": "2026-07-10T12:00:01.000Z",
+  "inputs": ["/Mira/iu", "Mira arrived", "Nix arrived"],
+  "transitions": ["DISCOVER", "CLASSIFY", "LOAD", "PLAN", "EXECUTE", "VALIDATE", "VERIFY", "REPORT"],
+  "references": [
+    {
+      "path": "references/keys-and-regex.md",
+      "sha256": "0cf32242adb96fd2532abd11a3a8aa31613fea99637ea1e5d9aef1390a4e6a01",
+      "evidence": "Fresh read event recorded by fixture builder."
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "VAL-KEY",
+      "ruleIds": ["ACE-KEY-001"],
+      "kind": "automatic",
+      "status": "PASS",
+      "command": "node scripts/ace.mjs key --key /Mira/iu --should-match 'Mira arrived' --should-not-match 'Nix arrived'",
+      "cwd": "/workspace/ace-skill",
+      "exitCode": 0,
+      "artifacts": [],
+      "evidence": "The positive matched, the negative did not match.",
+      "attempts": [{ "at": "2026-07-10T12:00:00.200Z", "exitCode": 0, "stdout": "PASS: key/test\n", "stderr": "" }]
+    },
+    {
+      "gateId": "VAL-SOURCES",
+      "ruleIds": ["ACE-SOURCE-001"],
+      "kind": "automatic",
+      "status": "PASS",
+      "command": "node scripts/ace.mjs validate sources",
+      "cwd": "/workspace/ace-skill",
+      "exitCode": 0,
+      "artifacts": [],
+      "evidence": "Pinned source metadata and conflict records passed validation.",
+      "attempts": [{ "at": "2026-07-10T12:00:00.400Z", "exitCode": 0, "stdout": "PASS: VAL-SOURCES\n", "stderr": "" }]
+    },
+    {
+      "gateId": "VAL-EVIDENCE",
+      "ruleIds": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004"],
+      "kind": "automatic",
+      "status": "PASS",
+      "command": "node scripts/ace.mjs validate evidence tests/fixtures/evidence/valid-template.json",
+      "cwd": "/workspace/ace-skill",
+      "exitCode": 0,
+      "artifacts": [],
+      "evidence": "The complete fixture ledger passed the evidence validator.",
+      "attempts": [{ "at": "2026-07-10T12:00:00.600Z", "exitCode": 0, "stdout": "PASS: VAL-EVIDENCE\n", "stderr": "" }]
+    },
+    {
+      "gateId": "MG-LORE-KEYS",
+      "ruleIds": ["ACE-KEY-002"],
+      "kind": "manual",
+      "status": "PASS",
+      "reviewerRunId": "reviewer-fixture-001",
+      "evidence": "Independent reviewer confirmed that the key targets the named character.",
+      "reviewEvidence": [{
+        "criterion": "Entry ID, key list, one positive case, and one meaningful negative case.",
+        "evidence": "Entry fixture/key uses /Mira/iu; positive 'Mira arrived'; negative 'Nix arrived'."
+      }]
+    }
+  ],
+  "overallStatus": "PASS"
+}

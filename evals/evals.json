@@ -1,0 +1,44 @@
+{
+  "skill_name": "ace-skill",
+  "evals": [
+    {
+      "id": 1,
+      "name": "character-card-authoring",
+      "prompt": "Create a SillyTavern Character Card V2 JSON for Mira, a cautious river-cartographer who hides professional doubt behind precise speech. Preserve user agency in the opening, include two distinct dialogue examples, and run every applicable ACE validation and token advisory. Save character.json and report.json.",
+      "expected_output": "A structurally valid V2 card plus fail-closed evidence. The report distinguishes structural, semantic, and token evidence and treats the 700-1500 token target as advisory.",
+      "files": [],
+      "expectations": [
+        "character.json is valid Character Card V2 JSON and passes the local card validator",
+        "the opening does not choose the user's thoughts, speech, feelings, or completed actions",
+        "dialogue examples demonstrate at least two distinguishable voice modes",
+        "report.json records actual token count, counting method, and the advisory 700-1500 range without turning an out-of-range result into FAIL"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "advanced-lorebook-audit",
+      "prompt": "Audit and simulate the supplied combined-conflicts World Info fixture. Produce trace.json and report.json that explain scan provenance, filters, vector candidates, probability, recursion, groups, timed state, budget, order, placement, included and excluded entries, and all BLOCKED runtime-only claims. Do not label simulation evidence as runtime evidence.",
+      "expected_output": "A deterministic fail-closed simulation trace and audit report with stable per-entry reason codes and no contradictory statuses.",
+      "files": ["tests/fixtures/simulator/combined-conflicts.json"],
+      "expectations": [
+        "trace.json is deterministic for the recorded seed and contains no direct Math.random-derived state",
+        "every entry has UID/index, field path, final status, and stable inclusion or rejection reason",
+        "budget is never negative, disabled entries are not inserted, and no entry is duplicated without an explicit reason",
+        "runtime-only evidence is BLOCKED unless a real adapter observation with runId is present"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "combined-card-lorebook-repair",
+      "prompt": "Repair the supplied invalid Character Card V2 and invalid lorebook as separate artifacts while keeping their shared facts consistent. Save repaired-card.json, repaired-lorebook.json, and report.json. Validate each artifact independently, test positive and negative activation cases, perform lossless lorebook round-trip verification, and report any semantic or runtime blockers without inventing PASS.",
+      "expected_output": "Two repaired artifacts and a combined evidence report with separate card/lorebook gates plus cross-artifact consistency evidence.",
+      "files": ["evals/inputs/card-v2-repair.json", "evals/inputs/lorebook-invalid.json"],
+      "expectations": [
+        "both repaired JSON artifacts pass their respective structural validators",
+        "lorebook round-trip reports no lost, changed, or added paths",
+        "positive and meaningful negative key cases are recorded for each keyed entry",
+        "report.json keeps card, lorebook, semantic, simulation, and runtime results separate and derives overall status fail-closed"
+      ]
+    }
+  ]
+}

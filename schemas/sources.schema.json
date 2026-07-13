@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "hierarchy", "sources", "conflicts"],
+  "properties": {
+    "version": { "type": "string" },
+    "hierarchy": { "type": "array", "items": { "type": "string" } },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "url", "type", "authority", "revision", "checkedAt", "reviewDue", "claims", "ruleIds"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^SRC-[A-Z0-9-]+$" }, "title": { "type": "string" },
+          "url": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["source-code", "documentation", "bundled-rule-export", "community-web-guide", "task-contract"] },
+          "authority": { "enum": ["official-source", "official-documentation", "observed-behavior", "local-practical-guide", "community-guide", "legacy-ace"] },
+          "revision": { "type": "string", "minLength": 1 },
+          "checkedAt": { "type": "string", "format": "date" }, "reviewDue": { "type": "string", "format": "date" },
+          "claims": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "ruleIds": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^ACE-[A-Z0-9-]+$" } },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "bundled-rule-export" } }, "required": ["type"] },
+            "then": {
+              "required": ["sha256"],
+              "properties": {
+                "url": { "type": "string", "pattern": "^local:(?![/\\\\]|.*(?:^|/)\\.\\.(?:/|$)).+" },
+                "revision": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "task-contract" } }, "required": ["type"] },
+            "then": { "properties": { "url": { "const": "local:task-specification" } } }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "topic", "legacyRule", "guideClaim", "officialBehavior", "resolution", "reason", "confidence", "ruleIds", "verification", "resolved"],
+        "properties": {
+          "id": { "type": "string" }, "topic": { "type": "string" }, "legacyRule": { "type": "string" },
+          "guideClaim": { "type": "string" }, "officialBehavior": { "type": "string" }, "resolution": { "type": "string" },
+          "reason": { "type": "string" }, "confidence": { "type": "string" },
+          "ruleIds": { "type": "array", "items": { "type": "string" } }, "verification": { "type": "string" },
+          "resolved": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

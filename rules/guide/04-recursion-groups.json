@@ -1,0 +1,374 @@
+{
+  "id": "recursion-groups",
+  "title": "Recursion, minimum activations, and inclusion groups",
+  "loadWhen": [
+    "testing recursion",
+    "testing minimum activations",
+    "resolving inclusion groups"
+  ],
+  "agentPrompt": "Trace recursion and Minimum Activations as bounded waves. Resolve inclusion groups in official release order, preserve rejection reasons, and terminate cycles deterministically.",
+  "rules": [
+    {
+      "id": "G-REC-001",
+      "action": "Verify that enabled recursion scans activated entry content in traceable waves and may branch.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion settings",
+        "locator": "lines 1039-1080"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-002",
+      "action": "Verify that recursion depth/step limits have explicit zero and boundary semantics.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion settings",
+        "locator": "lines 1081-1125"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-003",
+      "action": "Verify that exclude-recursion blocks incoming recursive activation but not direct activation.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Not Recursable",
+        "locator": "lines 1126-1144"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-004",
+      "action": "Verify that prevent-recursion inserts the entry but stops scanning its content for descendants.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Prevent Further Recursion",
+        "locator": "lines 1145-1158"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-005",
+      "action": "Verify that recursion-only entries require a reachable recursive predecessor.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion Only",
+        "locator": "lines 1159-1176"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-006",
+      "action": "Verify that self-cycles and multi-entry cycles terminate with stable cycle evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion settings",
+        "locator": "lines 1050-1125"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-007",
+      "action": "Verify that recursion interactions with budget, filters, groups, and timed state retain rejection reasons.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion settings",
+        "locator": "lines 1126-1176, 1307-1352"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-REC-008",
+      "action": "Implement Minimum Activations by extending chat scan depth until the target, Max Depth, history end, or budget limit is reached; exclude prior recursion text from minimum-activation scans and reject simultaneous nonzero Max Recursion Steps.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Recursion settings",
+        "locator": "lines 220-234"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "edge",
+        "wave",
+        "terminationReason"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-001",
+      "action": "Verify that group names and multi-group membership are normalized and validated.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group Scoring and inclusion groups",
+        "locator": "lines 1177-1216"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-002",
+      "action": "Verify that only simultaneously eligible group members compete and a sole eligible member needs no draw.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group Scoring and inclusion groups",
+        "locator": "lines 1217-1274"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-003",
+      "action": "Process each comma-separated inclusion group against shared candidate state in official release order; preserve cross-group removals and prior-recursion group activation state.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group Scoring and inclusion groups",
+        "locator": "lines 1217-1274"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-004",
+      "action": "Score every primary match; add secondary matches only for AND_ANY or for AND_ALL when all secondary keys match. Remove only scoring-enabled members below the group maximum.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group Scoring and inclusion groups",
+        "locator": "lines 960-1038"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-005",
+      "action": "For Prioritize Inclusion, select the eligible groupOverride entry with the highest Order before any weighted draw.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group override / Important",
+        "locator": "lines 1275-1290"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-GROUP-006",
+      "action": "Verify that weighted group selection is seeded and can only select an eligible member.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group weight",
+        "locator": "lines 1291-1306"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "members",
+        "scoreOrWeight",
+        "roll",
+        "winner"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    }
+  ]
+}

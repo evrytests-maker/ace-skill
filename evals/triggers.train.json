@@ -1,0 +1,146 @@
+{
+  "version": "5.0.0",
+  "split": "train",
+  "cases": [
+    {
+      "id": "TR-P01",
+      "query": "Создай новую карточку персонажа SillyTavern: description, scenario, first_mes и примеры диалогов.",
+      "shouldTrigger": true,
+      "category": "direct",
+      "rationale": "Explicit SillyTavern character-card authoring."
+    },
+    {
+      "id": "TR-P02",
+      "query": "Почини этот chara_card_v2 JSON: у него сломаны alternate_greetings и mes_example.",
+      "shouldTrigger": true,
+      "category": "direct",
+      "rationale": "Explicit card repair with native fields."
+    },
+    {
+      "id": "TR-P03",
+      "query": "Собери World Info для моей кампании и проверь, когда каждая entry активируется.",
+      "shouldTrigger": true,
+      "category": "direct",
+      "rationale": "World Info creation and activation validation."
+    },
+    {
+      "id": "TR-P04",
+      "query": "аудитни лорбук для силли таверны, там keysecondary вроде игнорятся",
+      "shouldTrigger": true,
+      "category": "colloquial",
+      "rationale": "Colloquial lorebook audit with a secondary-key defect."
+    },
+    {
+      "id": "TR-P05",
+      "query": "Напиши JavaScript regex key, который ловит русские формы «архив» и английское archive, и проверь отрицательные примеры.",
+      "shouldTrigger": true,
+      "category": "multi-step",
+      "rationale": "Activation-key design and testing in the supported domain."
+    },
+    {
+      "id": "TR-P06",
+      "query": "Проверь truth table selectiveLogic=2 для двух secondary keys в SillyTavern.",
+      "shouldTrigger": true,
+      "category": "direct",
+      "rationale": "Explicit secondary-key logic task."
+    },
+    {
+      "id": "TR-P07",
+      "query": "Посчитай token budget карточки и всех entries в приложенном World Info JSON, указав метод подсчёта.",
+      "shouldTrigger": true,
+      "category": "multi-step",
+      "rationale": "Supported card/lorebook token-budget validation."
+    },
+    {
+      "id": "TR-P08",
+      "query": "Сначала исправь greeting персонажа, потом lorebook JSON, потом проверь ключи и токены — короче, исправь всё для SillyTavern.",
+      "shouldTrigger": true,
+      "category": "buried",
+      "rationale": "Combined repair is buried inside a sequence."
+    },
+    {
+      "id": "TR-P09",
+      "query": "Проведи maintenance самого ACE-SKILL: найди orphan MUST и сломанные связи validators.",
+      "shouldTrigger": true,
+      "category": "direct",
+      "rationale": "Explicit self-maintenance scope."
+    },
+    {
+      "id": "TR-P10",
+      "query": "пачини силитаверн лорбок: селектив лоджик 9 и регексы не срабатывают",
+      "shouldTrigger": true,
+      "category": "typo",
+      "rationale": "Multiple misspellings still identify a lorebook and logic repair."
+    },
+    {
+      "id": "TR-N01",
+      "query": "Напиши короткий рассказ о трактире и страннике, который ищет старую книгу легенд.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Creative writing with tavern/book words, no SillyTavern artifact."
+    },
+    {
+      "id": "TR-N02",
+      "query": "Сделай биографию персонажа для моего романа в третьем лице.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Generic fiction character work."
+    },
+    {
+      "id": "TR-N03",
+      "query": "Помоги написать регулярное выражение JavaScript для проверки email в форме регистрации.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Generic regex programming unrelated to activation keys."
+    },
+    {
+      "id": "TR-N04",
+      "query": "Проверь JSON-конфиг моего ESLint и исправь синтаксис.",
+      "shouldTrigger": false,
+      "category": "direct",
+      "rationale": "Unrelated JSON validation."
+    },
+    {
+      "id": "TR-N05",
+      "query": "Посчитай токены в исходном коде React-компонента и оцени цену запроса.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Token counting outside character/lorebook scope."
+    },
+    {
+      "id": "TR-N06",
+      "query": "Что означает слово lorebook в литературоведении?",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Definition request, not artifact work."
+    },
+    {
+      "id": "TR-N07",
+      "query": "Как установить SillyTavern на Fedora и открыть порт в firewall?",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "SillyTavern is named but task is deployment support."
+    },
+    {
+      "id": "TR-N08",
+      "query": "Составь карточки Anki по истории Рима и добавь ключевые слова.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Cards and keys belong to another product."
+    },
+    {
+      "id": "TR-N09",
+      "query": "Отредактируй README этого npm-пакета на русском и английском.",
+      "shouldTrigger": false,
+      "category": "direct",
+      "rationale": "Generic repository documentation."
+    },
+    {
+      "id": "TR-N10",
+      "query": "Нарисуй интерфейс таверны: список персонажей, чат и счётчик контекста.",
+      "shouldTrigger": false,
+      "category": "buried",
+      "rationale": "UI design despite adjacent vocabulary."
+    }
+  ]
+}

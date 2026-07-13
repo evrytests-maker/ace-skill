@@ -1,0 +1,431 @@
+{
+  "id": "scope-format-entry",
+  "title": "Scope, attachment, format, and entries",
+  "loadWhen": [
+    "attaching lorebooks",
+    "importing or exporting lorebooks",
+    "validating entry structure"
+  ],
+  "agentPrompt": "Resolve lorebook attachment scope and container shape before evaluating entries. Preserve IDs, unknown extensions, source paths, and round-trip fidelity; reject conflicting containers and known-field typos instead of guessing.",
+  "rules": [
+    {
+      "id": "G-SCOPE-001",
+      "action": "Verify that an unattached lorebook cannot participate in activation.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Lorebook attachments and lorebook priorities",
+        "locator": "lines 89-92"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-002",
+      "action": "Verify that chat lore applies only to its bound chat and is not embedded in character export.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Attach to bot: chat binding",
+        "locator": "lines 93-103"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-003",
+      "action": "Verify that the primary character lorebook follows the character and is the character book eligible for embedding.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Attach to bot: primary character lore",
+        "locator": "lines 104-119"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-004",
+      "action": "Verify that additional character lorebooks may be multiple but remain external links.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Attach to bot: additional character lore",
+        "locator": "lines 120-132"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-005",
+      "action": "Verify that persona lore follows the selected persona; export behavior requires artifact evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Persona attachment",
+        "locator": "lines 143-152"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-006",
+      "action": "Verify that global lore applies across chats, personas, and characters in the active installation.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Global attachment",
+        "locator": "lines 153-160"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-007",
+      "action": "Verify that group-chat lore attachment requires an existing group chat.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Group-chat attachment",
+        "locator": "lines 133-142"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-SCOPE-009",
+      "action": "Merge Chat Lore first, Persona Lore second, then Character and Global Lore according to the configured evenly/character-first/global-first strategy.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Lorebook attachments and lorebook priorities",
+        "locator": "lines 171-196"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "covered",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-EVIDENCE",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-FMT-001",
+      "action": "Accept supported standalone and embedded entries containers without confusing their shape.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Lorebook creation and import",
+        "locator": "lines 253-330"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "containerPath",
+        "containerShape",
+        "pathDiff"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-IMPORT-EXPORT",
+        "M-EVIDENCE"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-FMT-002",
+      "action": "Verify that canonical round-trip preserves IDs, keys, extensions, order, scope metadata, regex escaping, and container shape.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Import and attachment export claims",
+        "locator": "lines 102-132, 143-152, 253-330"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "containerPath",
+        "containerShape",
+        "pathDiff"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-IMPORT-EXPORT",
+        "M-EVIDENCE"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-FMT-003",
+      "action": "Verify that conflicting native and alias fields are reported rather than silently discarded.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Lorebook creation and import",
+        "locator": "lines 261-316"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "containerPath",
+        "containerShape",
+        "pathDiff"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-IMPORT-EXPORT",
+        "M-EVIDENCE"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-ENTRY-001",
+      "action": "Verify that a disabled entry is excluded even when another activation condition matches.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Entry enable/disable toggle",
+        "locator": "lines 420-429"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-ENTRY-002",
+      "action": "Verify that entry title/comment is UI metadata and does not replace content or activate the entry.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Entry title",
+        "locator": "lines 430-437"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-ENTRY-003",
+      "action": "Verify that entry content is non-empty, self-contained, and limited to a coherent responsibility.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Entry creation and key-selection recommendations",
+        "locator": "lines 398-417, 697-729"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-ENTRY-004",
+      "action": "Verify that normal, Constant, and Vectorized modes use distinct candidate paths and share downstream checks.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Entry activation status",
+        "locator": "lines 438-543"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-ENTRY-005",
+      "action": "Verify that known-field typos are diagnosed with a supported-field suggestion.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Lorebook entry settings",
+        "locator": "lines 418-543"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-WI-SIMULATOR",
+        "M-MANUAL"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-SCOPE-008",
+      "action": "Choose the narrowest attachment scope that satisfies the intended use.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Attachment recommendations",
+        "locator": "lines 161-170"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "scope",
+        "attachmentSource",
+        "artifactPath"
+      ],
+      "status": "ADVISORY",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-ADVISORY",
+        "M-MANUAL"
+      ],
+      "verification": "advisory"
+    }
+  ]
+}

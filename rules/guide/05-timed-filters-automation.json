@@ -1,0 +1,261 @@
+{
+  "id": "timed-filters-automation",
+  "title": "Timed effects, filters, triggers, and automation",
+  "loadWhen": [
+    "testing sticky/cooldown/delay",
+    "filtering candidates",
+    "queuing Automation IDs"
+  ],
+  "agentPrompt": "Apply character, tag, generation-type, and timed-state filters to every activation path. Invalidate state on the same chat mutations as SillyTavern and emit deduplicated Automation IDs without claiming execution unless a runtime adapter proves it.",
+  "rules": [
+    {
+      "id": "G-AUTO-001",
+      "action": "Queue activated Automation IDs in actual activation order, deduplicate equal IDs, and claim execution only when a genuine Quick Replies runtime adapter returns evidence.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Priority (Automation ID mention)",
+        "locator": "line 666"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "fieldPath",
+        "runtimeObservation"
+      ],
+      "status": "qualified",
+      "authority": "runtime-contract-unavailable",
+      "mechanisms": [
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-TIME-001",
+      "action": "Verify that timed state is serializable and keyed by stable entry identity and message number.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Timed effects",
+        "locator": "lines 1307-1316"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-TIME-002",
+      "action": "Verify that sticky duration has exact boundaries, does not restart while active, and avoids a repeated probability roll.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Sticky",
+        "locator": "lines 1317-1332"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-TIME-003",
+      "action": "Verify that cooldown blocks all activation paths and begins after sticky when both are configured.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Cooldown",
+        "locator": "lines 1333-1344"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-TIME-004",
+      "action": "Verify that delay blocks activation until the exact one-time message threshold.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Delay",
+        "locator": "lines 1345-1352"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-TIME-005",
+      "action": "Invalidate active timed effects when the chat does not advance or the entry hash changes; preserve inherited state on a branch and record the invalidation reason.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Timed effects",
+        "locator": "lines 1307-1316"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-TIME-006",
+      "action": "Verify that negative, fractional, non-finite, excessive, and conflicting timed values fail closed.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Timed effects",
+        "locator": "lines 1317-1352"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "messageNumber",
+        "serializedState"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-FILTER-001",
+      "action": "Resolve the current character name/avatar and tag IDs against characterFilter. Include mode requires any selected name/tag; Exclude mode inverts that result.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Character or tag filters",
+        "locator": "lines 1353-1374"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "filterInput",
+        "filterDecision"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    },
+    {
+      "id": "G-FILTER-002",
+      "action": "Verify that generation-type filters distinguish normal, continue, impersonate, swipe, regenerate, and quiet generation.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Generation-type filters",
+        "locator": "lines 1375-1400"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "filterInput",
+        "filterDecision"
+      ],
+      "status": "qualified",
+      "authority": "community-guide-qualified-by-pinned-source",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "G-FILTER-003",
+      "action": "Verify that filters apply consistently to direct, constant, vector, and recursive candidates.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Activation filters",
+        "locator": "lines 1353-1400"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "entryUidOrIndex",
+        "filterInput",
+        "filterDecision"
+      ],
+      "status": "covered",
+      "authority": "pinned-source-confirmed",
+      "mechanisms": [
+        "M-WI-SIMULATOR",
+        "M-LORE-VALIDATOR",
+        "M-RUNTIME"
+      ],
+      "verification": "automatic"
+    }
+  ]
+}

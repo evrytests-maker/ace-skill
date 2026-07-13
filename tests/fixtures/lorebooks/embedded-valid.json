@@ -1,0 +1,28 @@
+{
+  "spec": "chara_card_v2",
+  "spec_version": "2.0",
+  "data": {
+    "character_book": {
+      "name": "Embedded Character Book fixture",
+      "description": "A minimal embedded character-book container.",
+      "scan_depth": 2,
+      "token_budget": 512,
+      "recursive_scanning": false,
+      "entries": [
+        {
+          "id": 1,
+          "keys": ["Mira", "архив"],
+          "secondary_keys": ["door"],
+          "comment": "Mira archive fact",
+          "content": "Mira works as the city archive's night custodian and records every unexplained event before acting.",
+          "enabled": true,
+          "selective": true,
+          "secondary_logic": 3,
+          "insertion_order": 100,
+          "position": "before_char",
+          "extensions": {}
+        }
+      ]
+    }
+  }
+}

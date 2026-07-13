@@ -1,0 +1,185 @@
+{
+  "id": "card-and-advisories",
+  "title": "Character-card rules and non-blocking advice",
+  "loadWhen": [
+    "working on a character card",
+    "reporting subjective recommendations"
+  ],
+  "agentPrompt": "Apply character-card rules only to relevant card fields. Preserve user agency and playable greetings; keep subjective style and token-size recommendations advisory unless runtime evidence supports a stronger claim.",
+  "rules": [
+    {
+      "id": "G-ADVISORY-001",
+      "action": "Verify that subjective key count, size, language, organization, and influence recommendations remain non-blocking.",
+      "source": {
+        "sourceId": "SRC-LOREBOOK-GUIDE",
+        "section": "Guide recommendations and caveats",
+        "locator": "lines 65-88, 161-169, 568-580, 697-729"
+      },
+      "inputs": [
+        "artifact fields",
+        "global settings",
+        "execution context",
+        "recommendation",
+        "rationale",
+        "nonBlocking"
+      ],
+      "status": "ADVISORY",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-ADVISORY",
+        "M-MANUAL"
+      ],
+      "verification": "advisory"
+    },
+    {
+      "id": "ST-CC-BEHAVIOR-001",
+      "action": "Verify that characterization connects inner causes to observable choices, reactions, or recurring behavior instead of relying on adjective lists.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Step 2: Description/Personality",
+        "locator": "https://rentry.org/statuobotmakie#step-2-descriptionpersonality"
+      },
+      "inputs": [
+        "fieldPath",
+        "excerpt",
+        "innerCause",
+        "outwardBehavior"
+      ],
+      "status": "qualified",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "ST-CC-MOTIVATION-001",
+      "action": "Verify that motivation is evidenced by consequences for the character's decisions and reactions, while fixed goal counts remain optional authoring advice.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Template for Bot Creation; update 05-22-2026",
+        "locator": "https://rentry.org/statuobotmakie#template-for-bot-creation"
+      },
+      "inputs": [
+        "fieldPath",
+        "motivationExcerpt",
+        "behavioralConsequence"
+      ],
+      "status": "qualified",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "ST-CC-USER-AGENCY-001",
+      "action": "Verify that roleplay-facing card fields preserve the user's unchosen thoughts, speech, feelings, decisions, and completed actions.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Step 3: The Introduction Message",
+        "locator": "https://rentry.org/statuobotmakie#step-3-the-introduction-message"
+      },
+      "inputs": [
+        "fieldPath",
+        "excerpt",
+        "userConstraintSource",
+        "agencyAssessment"
+      ],
+      "status": "qualified",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "ST-CC-GREETING-SCENE-001",
+      "action": "Verify that every greeting establishes an immediate playable scene, demonstrates character action or speech, and hands an unresolved turn to the user.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Step 3: The Introduction Message / Extra Introduction Messages",
+        "locator": "https://rentry.org/statuobotmakie#step-3-the-introduction-message"
+      },
+      "inputs": [
+        "fieldPathOrIndex",
+        "sceneEvidence",
+        "characterActionOrSpeech",
+        "playableHandoff"
+      ],
+      "status": "qualified",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "ST-CC-DIALOGUE-VOICE-001",
+      "action": "Verify that example dialogue demonstrates each claimed voice or behavior mode without imposing a universal number or template.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Step 5: Example Messages/Example Dialogue",
+        "locator": "https://rentry.org/statuobotmakie#step-5-example-messagesexample-dialogue"
+      },
+      "inputs": [
+        "fieldPath",
+        "claimedMode",
+        "supportingExcerpt",
+        "cardConsistency"
+      ],
+      "status": "qualified",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-MANUAL"
+      ],
+      "verification": "qualified-simulation"
+    },
+    {
+      "id": "ST-CC-TESTING-001",
+      "action": "Verify that a claimed runtime behavior PASS requires an executed compatible runtime test with model, preset, greeting, representative turns, and repair/retest evidence.",
+      "source": {
+        "sourceId": "SRC-STATUO-GUIDE",
+        "section": "Step 6: Testing",
+        "locator": "https://rentry.org/statuobotmakie#step-6-testing"
+      },
+      "inputs": [
+        "runtimeAdapter",
+        "runId",
+        "modelPreset",
+        "testedGreeting",
+        "representativeTurns"
+      ],
+      "status": "BLOCKED",
+      "authority": "community-advisory",
+      "mechanisms": [
+        "M-RUNTIME",
+        "M-MANUAL"
+      ],
+      "verification": "runtime-only"
+    },
+    {
+      "id": "ACE-CARD-TOTAL-TOKENS-ADVISORY",
+      "action": "Verify that the complete character-card total has an inclusive 700–1500 token advisory range; lower or higher totals warn without failing the card solely for size.",
+      "source": {
+        "sourceId": "SRC-ACE-REQUEST",
+        "section": "User-requested character creation rule",
+        "locator": "local:task-specification"
+      },
+      "inputs": [
+        "artifactType",
+        "actualTokens",
+        "minTokens",
+        "maxTokens",
+        "methodKind"
+      ],
+      "status": "ADVISORY",
+      "authority": "task-contract",
+      "mechanisms": [
+        "M-CARD-TOKEN-ADVISORY",
+        "M-CARD-ADVISORY"
+      ],
+      "verification": "advisory"
+    }
+  ]
+}

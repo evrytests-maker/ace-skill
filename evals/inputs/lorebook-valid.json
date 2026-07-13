@@ -1,0 +1,19 @@
+{
+  "name": "City archive evaluation input",
+  "entries": {
+    "0": {
+      "uid": 0,
+      "key": ["archive", "/sealed\\s+door/iu"],
+      "keysecondary": ["Mira", "archivist"],
+      "comment": "Archive entrance",
+      "content": "The sealed city archive has an iron east door, a damaged registry desk, and no publicly listed basement room.",
+      "constant": false,
+      "vectorized": false,
+      "selective": true,
+      "selectiveLogic": 0,
+      "order": 100,
+      "position": 0,
+      "disable": false
+    }
+  }
+}

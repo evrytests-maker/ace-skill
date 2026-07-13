@@ -1,0 +1,20 @@
+{
+  "spec": "chara_card_v2",
+  "spec_version": "2.0",
+  "data": {
+    "name": "Character Name",
+    "description": "Write behavior, motivation, relevant history, appearance, and relationships without imposing one universal template.",
+    "personality": "Optional concise reinforcement of the central behavioral tendencies.",
+    "scenario": "Describe persistent circumstances only when they apply to every greeting.",
+    "first_mes": "{{char}} creates an immediate situation and leaves {{user}} free to choose a response.",
+    "mes_example": "<START>\n{{user}}: A useful prompt.\n{{char}}: A reply that demonstrates the intended voice and behavior.",
+    "creator_notes": "",
+    "system_prompt": "",
+    "post_history_instructions": "",
+    "alternate_greetings": [],
+    "tags": [],
+    "creator": "",
+    "character_version": "1.0",
+    "extensions": {}
+  }
+}

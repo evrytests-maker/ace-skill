@@ -1,0 +1,119 @@
+{
+  "version": "5.0.0",
+  "states": ["DISCOVER", "CLASSIFY", "LOAD", "PLAN", "EXECUTE", "VALIDATE", "REPAIR", "VERIFY", "REPORT"],
+  "maxRepairCycles": 5,
+  "workflows": [
+    {
+      "id": "character-create",
+      "trigger": "Create a new SillyTavern character card or its prose fields.",
+      "inputs": ["user requirements", "optional source character data"],
+      "requiredReferences": ["references/character-cards.md"],
+      "forbiddenReferences": ["references/lorebooks.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-CARD-001", "ACE-CARD-002", "ACE-CARD-003", "ACE-CARD-004", "ACE-CARD-005", "ACE-STYLE-001", "ACE-STYLE-002", "ACE-TOKEN-001"],
+      "validators": ["VAL-CARD", "VAL-STYLE", "VAL-TOKENS", "VAL-EVIDENCE"],
+      "manualGates": ["MG-CARD-CHARACTERIZATION", "MG-CARD-GREETING", "MG-CARD-VOICE", "MG-STYLE-CONTRAST"],
+      "outputs": ["character artifact or requested fields", "evidence ledger"],
+      "completeWhen": "Applicable card gates pass and the final artifact was reopened and verified."
+    },
+    {
+      "id": "character-repair",
+      "trigger": "Repair or audit an existing character card.",
+      "inputs": ["existing card", "repair request"],
+      "requiredReferences": ["references/character-cards.md"],
+      "forbiddenReferences": ["references/lorebooks.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-CARD-001", "ACE-CARD-002", "ACE-CARD-003", "ACE-CARD-004", "ACE-CARD-005", "ACE-STYLE-001", "ACE-STYLE-002", "ACE-TOKEN-001"],
+      "validators": ["VAL-CARD", "VAL-STYLE", "VAL-TOKENS", "VAL-EVIDENCE"],
+      "manualGates": ["MG-CARD-CHARACTERIZATION", "MG-CARD-GREETING", "MG-CARD-VOICE", "MG-STYLE-CONTRAST"],
+      "outputs": ["repaired card", "change summary", "evidence ledger"],
+      "completeWhen": "Original failures are evidenced, repaired, and rerun."
+    },
+    {
+      "id": "lorebook-create",
+      "trigger": "Create World Info or lorebook entries.",
+      "inputs": ["world facts", "activation requirements"],
+      "requiredReferences": ["references/lorebooks.md"],
+      "forbiddenReferences": ["references/character-cards.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-LORE-001", "ACE-LORE-002", "ACE-LORE-003", "ACE-LORE-004", "ACE-KEY-001", "ACE-KEY-002", "ACE-STYLE-001", "ACE-STYLE-002", "ACE-TOKEN-001", "ACE-SOURCE-001"],
+      "validators": ["VAL-LORE", "VAL-KEY", "VAL-SECONDARY", "VAL-STYLE", "VAL-TOKENS", "VAL-SOURCES", "VAL-EVIDENCE"],
+      "manualGates": ["MG-LORE-SEMANTICS", "MG-LORE-KEYS", "MG-STYLE-CONTRAST"],
+      "outputs": ["lorebook JSON", "activation cases", "evidence ledger"],
+      "completeWhen": "Structure, activation, semantics, and budget gates pass."
+    },
+    {
+      "id": "lorebook-audit",
+      "trigger": "Audit or repair existing World Info/lorebook JSON.",
+      "inputs": ["existing lorebook", "optional chat samples"],
+      "requiredReferences": ["references/lorebooks.md"],
+      "forbiddenReferences": ["references/character-cards.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-LORE-001", "ACE-LORE-002", "ACE-LORE-003", "ACE-LORE-004", "ACE-KEY-001", "ACE-KEY-002", "ACE-STYLE-001", "ACE-STYLE-002", "ACE-TOKEN-001", "ACE-SOURCE-001"],
+      "validators": ["VAL-LORE", "VAL-KEY", "VAL-SECONDARY", "VAL-STYLE", "VAL-TOKENS", "VAL-SOURCES", "VAL-EVIDENCE"],
+      "manualGates": ["MG-LORE-SEMANTICS", "MG-LORE-KEYS", "MG-STYLE-CONTRAST"],
+      "outputs": ["audit findings", "repaired lorebook when requested", "evidence ledger"],
+      "completeWhen": "Every mandatory finding is repaired or objectively BLOCKED."
+    },
+    {
+      "id": "key-regex-test",
+      "trigger": "Design or test SillyTavern plaintext or JavaScript regex keys.",
+      "inputs": ["key", "positive examples", "negative examples"],
+      "requiredReferences": ["references/keys-and-regex.md"],
+      "forbiddenReferences": ["references/character-cards.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-KEY-001", "ACE-KEY-002", "ACE-SOURCE-001"],
+      "validators": ["VAL-KEY", "VAL-SOURCES", "VAL-EVIDENCE"],
+      "manualGates": ["MG-LORE-KEYS"],
+      "outputs": ["tested key", "case results", "evidence ledger"],
+      "completeWhen": "All positive and negative cases have explicit results."
+    },
+    {
+      "id": "secondary-logic-test",
+      "trigger": "Test keysecondary/selectiveLogic behavior.",
+      "inputs": ["primary keys", "secondary keys", "logic", "case matrix"],
+      "requiredReferences": ["references/lorebooks.md", "references/keys-and-regex.md"],
+      "forbiddenReferences": ["references/character-cards.md"],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-LORE-002", "ACE-LORE-003", "ACE-KEY-001", "ACE-SOURCE-001"],
+      "validators": ["VAL-LORE", "VAL-KEY", "VAL-SECONDARY", "VAL-SOURCES", "VAL-EVIDENCE"],
+      "manualGates": [],
+      "outputs": ["truth-table results", "evidence ledger"],
+      "completeWhen": "All official logic modes and supplied cases pass."
+    },
+    {
+      "id": "token-budget",
+      "trigger": "Measure or analyze a card or lorebook token budget.",
+      "inputs": ["artifact", "tokenizer profile or explicit estimate permission"],
+      "requiredReferences": [],
+      "forbiddenReferences": [],
+      "referenceCases": {
+        "character": { "requiredReferences": ["references/character-cards.md"], "forbiddenReferences": ["references/lorebooks.md"] },
+        "lorebook": { "requiredReferences": ["references/lorebooks.md"], "forbiddenReferences": ["references/character-cards.md"] }
+      },
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-TOKEN-001", "ACE-CARD-005"],
+      "validators": ["VAL-TOKENS", "VAL-EVIDENCE"],
+      "manualGates": [],
+      "outputs": ["field-level token report", "method label", "evidence ledger"],
+      "completeWhen": "Method and exact/estimate status are explicit."
+    },
+    {
+      "id": "combined-repair",
+      "trigger": "Repair character-card and lorebook artifacts in one request.",
+      "inputs": ["card", "lorebook", "repair request"],
+      "requiredReferences": ["references/character-cards.md", "references/lorebooks.md", "references/keys-and-regex.md"],
+      "forbiddenReferences": [],
+      "rules": ["ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-CARD-001", "ACE-CARD-002", "ACE-CARD-003", "ACE-CARD-004", "ACE-CARD-005", "ACE-LORE-001", "ACE-LORE-002", "ACE-LORE-003", "ACE-LORE-004", "ACE-KEY-001", "ACE-KEY-002", "ACE-STYLE-001", "ACE-STYLE-002", "ACE-TOKEN-001", "ACE-SOURCE-001", "ACE-OUTPUT-001"],
+      "validators": ["VAL-CARD", "VAL-LORE", "VAL-KEY", "VAL-SECONDARY", "VAL-STYLE", "VAL-TOKENS", "VAL-SOURCES", "VAL-EVIDENCE"],
+      "manualGates": ["MG-CARD-CHARACTERIZATION", "MG-CARD-GREETING", "MG-CARD-VOICE", "MG-LORE-SEMANTICS", "MG-LORE-KEYS", "MG-STYLE-CONTRAST", "MG-COMBINED-SEPARATION"],
+      "outputs": ["repaired card", "repaired lorebook", "separate domain evidence"],
+      "completeWhen": "Both domains independently pass."
+    },
+    {
+      "id": "skill-maintenance",
+      "trigger": "Create, edit, audit, or test ACE-SKILL itself.",
+      "inputs": ["repository", "requested architecture change"],
+      "requiredReferences": ["references/skill-architecture-research.md", "references/sources-and-conflicts.md", "references/migration-notes.md"],
+      "forbiddenReferences": [],
+      "rules": ["ACE-TRIGGER-001", "ACE-CORE-001", "ACE-CORE-002", "ACE-CORE-003", "ACE-CORE-004", "ACE-SOURCE-001", "ACE-REPO-001", "ACE-REPO-002", "ACE-REPO-003", "ACE-REPO-004", "ACE-REPO-005"],
+      "validators": ["VAL-RULES", "VAL-DOCS", "VAL-SOURCES", "VAL-LANGUAGE", "VAL-EVIDENCE", "VAL-EVAL-DATA"],
+      "manualGates": [],
+      "outputs": ["repository changes", "test and eval results", "evidence ledger"],
+      "completeWhen": "Fast checks, sabotage tests, local evaluation dataset validation, and full evidence validation pass; external model evaluations are reported separately."
+    }
+  ]
+}

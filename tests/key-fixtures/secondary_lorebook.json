@@ -1,0 +1,61 @@
+{
+  "name": "secondary selectiveLogic fixture",
+  "entries": {
+    "0": {
+      "uid": 0,
+      "comment": "AND ANY positive/negative fixture",
+      "key": ["Nix"],
+      "keysecondary": ["loud sound", "alarm"],
+      "selective": true,
+      "selectiveLogic": 0,
+      "content": "Nix reacts when the primary key is present and any secondary trigger appears.",
+      "position": 0,
+      "order": 100
+    },
+    "1": {
+      "uid": 1,
+      "comment": "NOT ALL positive/blocked fixture",
+      "key": ["Nix"],
+      "keysecondary": ["battle", "army"],
+      "selective": true,
+      "selectiveLogic": 1,
+      "content": "Nix reacts unless every secondary blocking condition is present at once.",
+      "position": 1,
+      "order": 110
+    },
+    "2": {
+      "uid": 2,
+      "comment": "NOT ANY positive/blocked fixture",
+      "key": ["forest"],
+      "keysecondary": ["fire", "smoke"],
+      "selective": true,
+      "selectiveLogic": 2,
+      "content": "The forest lore activates only when none of the excluded secondary keys appear.",
+      "position": 4,
+      "depth": 3,
+      "order": 120
+    },
+    "3": {
+      "uid": 3,
+      "comment": "AND ALL positive/negative fixture",
+      "key": ["gate"],
+      "keysecondary": ["sunset", "key"],
+      "selective": true,
+      "selectiveLogic": 3,
+      "content": "The gate lore activates only when the primary key and all required secondary keys appear.",
+      "position": 6,
+      "order": 130
+    },
+    "4": {
+      "uid": 4,
+      "comment": "strict mode ignores secondary when selective is false",
+      "key": ["cat"],
+      "keysecondary": ["rain"],
+      "selective": false,
+      "selectiveLogic": 2,
+      "content": "This diagnostic fixture proves keysecondary is ignored unless selective is true.",
+      "position": 7,
+      "order": 140
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "version": "5.0.0",
+  "split": "validation",
+  "cases": [
+    {
+      "id": "VA-P01",
+      "query": "Вот PNG карточки из SillyTavern. Восстанови корректный V3 JSON и не управляй действиями {{user}} в greeting.",
+      "shouldTrigger": true,
+      "category": "multi-step",
+      "rationale": "Card conversion plus a semantic gate."
+    },
+    {
+      "id": "VA-P02",
+      "query": "В entry есть keysecondary, selective=false и selectiveLogic=3. Найди ошибку и докажи исправление тестами.",
+      "shouldTrigger": true,
+      "category": "buried",
+      "rationale": "Fields unambiguously identify World Info logic."
+    },
+    {
+      "id": "VA-P03",
+      "query": "Мне нужен лорбук: constant entry для календаря, обычные entries для мест и regex key для склонений имени.",
+      "shouldTrigger": true,
+      "category": "multi-step",
+      "rationale": "Lorebook design with multiple activation mechanisms."
+    },
+    {
+      "id": "VA-P04",
+      "query": "Сделай first_mes более игровым, сохрани голос бота и добавь разные example dialogues — это карточка для ST.",
+      "shouldTrigger": true,
+      "category": "colloquial",
+      "rationale": "Common abbreviation plus card-specific fields."
+    },
+    {
+      "id": "VA-P05",
+      "query": "прверь ворлд инфо жсон и почему /маг(?:а|у|ом)/iu не включает ентри",
+      "shouldTrigger": true,
+      "category": "typo",
+      "rationale": "Typos do not hide a World Info regex activation task."
+    },
+    {
+      "id": "VA-P06",
+      "query": "Мы меняем этот skill. Перепроверь его rule registry, evidence ledger и mutation tests для карточек SillyTavern.",
+      "shouldTrigger": true,
+      "category": "buried",
+      "rationale": "ACE maintenance described without relying only on its name."
+    },
+    {
+      "id": "VA-N01",
+      "query": "Создай карточку персонажа для настольной игры: имя, класс, сила, ловкость и инвентарь.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "A game card, but not a SillyTavern character card."
+    },
+    {
+      "id": "VA-N02",
+      "query": "Напиши приветствие от лица злодея для первой главы романа.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Greeting prose outside a card artifact."
+    },
+    {
+      "id": "VA-N03",
+      "query": "Сравни AND ANY и AND ALL в булевой алгебре и построй таблицу истинности.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Same terms without secondary-key context."
+    },
+    {
+      "id": "VA-N04",
+      "query": "Почини CLI: команда --not неправильно разбирает аргументы в моём grep-клоне.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "CLI and --not are unrelated to ACE artifacts."
+    },
+    {
+      "id": "VA-N05",
+      "query": "Я пользуюсь SillyTavern. Посоветуй модель и API-провайдера для ролевого чата.",
+      "shouldTrigger": false,
+      "category": "near-miss",
+      "rationale": "Product-adjacent recommendation, not supported artifact work."
+    },
+    {
+      "id": "VA-N06",
+      "query": "Проверь английскую грамматику текста про world lore и персонажей, не меняя смысл.",
+      "shouldTrigger": false,
+      "category": "buried",
+      "rationale": "General copyediting with adjacent terms."
+    }
+  ]
+}

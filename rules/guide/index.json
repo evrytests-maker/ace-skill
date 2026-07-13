@@ -1,0 +1,291 @@
+{
+  "version": "5.0.0-ai-rule-packs-v1",
+  "source": {
+    "id": "SRC-LOREBOOK-GUIDE",
+    "authority": "community-guide-qualified-by-pinned-source",
+    "versionContext": "SillyTavern 1.15.0 (088ce0e96)",
+    "sha256": "8ed0f86dbebbb3c472245badbbfee8c0d4d3c413ac2cd23eec9c525454ae1566",
+    "lineCount": 1694,
+    "verification": "Each locator was checked against this exact source during the build; excerpts remain outside runtime packs to avoid duplicate token cost."
+  },
+  "additionalSources": [
+    {
+      "id": "SRC-STATUO-GUIDE",
+      "url": "https://rentry.org/statuobotmakie",
+      "checkedAt": "2026-07-12",
+      "revision": "page-edited-2026-05-22"
+    },
+    {
+      "id": "SRC-ACE-REQUEST",
+      "locator": "local:task-specification",
+      "checkedAt": "2026-07-12"
+    }
+  ],
+  "authorityPolicy": "Official SillyTavern release code overrides conflicting community-guide prose. Qualified runtime claims remain qualified.",
+  "defaultAgentContract": {
+    "applicability": "Run a rule only when its listed inputs exist or the output claims that behavior.",
+    "onNotApplicable": "Return N/A with a registered reason and inspected field paths.",
+    "onFailure": "Return FAIL or BLOCKED; never silently repair evidence or upgrade simulation to runtime PASS."
+  },
+  "packs": [
+    {
+      "id": "scope-format-entry",
+      "file": "01-scope-format-entry.json",
+      "title": "Scope, attachment, format, and entries",
+      "loadWhen": [
+        "attaching lorebooks",
+        "importing or exporting lorebooks",
+        "validating entry structure"
+      ]
+    },
+    {
+      "id": "scanning-keys-regex",
+      "file": "02-scanning-keys-regex.json",
+      "title": "Scanning, keys, selective logic, and regex",
+      "loadWhen": [
+        "testing key activation",
+        "resolving scan buffers",
+        "auditing regex"
+      ]
+    },
+    {
+      "id": "placement-probability-budget",
+      "file": "03-placement-probability-budget.json",
+      "title": "Placement, outlets, probability, budget, and pipeline",
+      "loadWhen": [
+        "assembling prompts",
+        "testing outlets",
+        "checking probability or budget"
+      ]
+    },
+    {
+      "id": "recursion-groups",
+      "file": "04-recursion-groups.json",
+      "title": "Recursion, minimum activations, and inclusion groups",
+      "loadWhen": [
+        "testing recursion",
+        "testing minimum activations",
+        "resolving inclusion groups"
+      ]
+    },
+    {
+      "id": "timed-filters-automation",
+      "file": "05-timed-filters-automation.json",
+      "title": "Timed effects, filters, triggers, and automation",
+      "loadWhen": [
+        "testing sticky/cooldown/delay",
+        "filtering candidates",
+        "queuing Automation IDs"
+      ]
+    },
+    {
+      "id": "vectors-evidence",
+      "file": "06-vectors-evidence.json",
+      "title": "Vector retrieval and evidence boundaries",
+      "loadWhen": [
+        "testing Vector Storage",
+        "classifying evidence",
+        "claiming PASS/BLOCKED/N/A"
+      ]
+    },
+    {
+      "id": "card-and-advisories",
+      "file": "07-card-and-advisories.json",
+      "title": "Character-card rules and non-blocking advice",
+      "loadWhen": [
+        "working on a character card",
+        "reporting subjective recommendations"
+      ]
+    }
+  ],
+  "expectedRuleIds": [
+    "G-SCOPE-001",
+    "G-SCOPE-002",
+    "G-SCOPE-003",
+    "G-SCOPE-004",
+    "G-SCOPE-005",
+    "G-SCOPE-006",
+    "G-SCOPE-007",
+    "G-SCOPE-009",
+    "G-FMT-001",
+    "G-FMT-002",
+    "G-FMT-003",
+    "G-ENTRY-001",
+    "G-ENTRY-002",
+    "G-ENTRY-003",
+    "G-ENTRY-004",
+    "G-ENTRY-005",
+    "G-SCAN-001",
+    "G-SCAN-002",
+    "G-SCAN-003",
+    "G-SCAN-004",
+    "G-SCAN-005",
+    "G-KEY-001",
+    "G-KEY-002",
+    "G-KEY-003",
+    "G-KEY-004",
+    "G-KEY-005",
+    "G-KEY-006",
+    "G-REGEX-001",
+    "G-REGEX-002",
+    "G-REGEX-003",
+    "G-REGEX-004",
+    "G-PLACE-001",
+    "G-PLACE-002",
+    "G-PLACE-003",
+    "G-PLACE-004",
+    "G-PLACE-005",
+    "G-PLACE-006",
+    "G-PLACE-007",
+    "G-PLACE-008",
+    "G-PLACE-009",
+    "G-AUTO-001",
+    "G-PROB-001",
+    "G-BUDGET-001",
+    "G-BUDGET-002",
+    "G-BUDGET-003",
+    "G-REC-001",
+    "G-REC-002",
+    "G-REC-003",
+    "G-REC-004",
+    "G-REC-005",
+    "G-REC-006",
+    "G-REC-007",
+    "G-REC-008",
+    "G-GROUP-001",
+    "G-GROUP-002",
+    "G-GROUP-003",
+    "G-GROUP-004",
+    "G-GROUP-005",
+    "G-GROUP-006",
+    "G-TIME-001",
+    "G-TIME-002",
+    "G-TIME-003",
+    "G-TIME-004",
+    "G-TIME-005",
+    "G-TIME-006",
+    "G-FILTER-001",
+    "G-FILTER-002",
+    "G-FILTER-003",
+    "G-VEC-001",
+    "G-VEC-002",
+    "G-VEC-003",
+    "G-VEC-004",
+    "G-VEC-005",
+    "G-VEC-006",
+    "G-VEC-007",
+    "G-PIPE-001",
+    "G-PIPE-002",
+    "G-EVID-001",
+    "G-EVID-002",
+    "G-EVID-003",
+    "G-EVID-004",
+    "G-EVID-005",
+    "G-EVID-006",
+    "G-SCOPE-008",
+    "G-ADVISORY-001",
+    "ST-CC-BEHAVIOR-001",
+    "ST-CC-MOTIVATION-001",
+    "ST-CC-USER-AGENCY-001",
+    "ST-CC-GREETING-SCENE-001",
+    "ST-CC-DIALOGUE-VOICE-001",
+    "ST-CC-TESTING-001",
+    "ACE-CARD-TOTAL-TOKENS-ADVISORY"
+  ],
+  "mechanisms": [
+    {
+      "id": "M-LORE-VALIDATOR",
+      "kind": "validator",
+      "path": "scripts/services/lorebook.mjs",
+      "testFiles": [
+        "tests/unit/lorebook-advanced-validation.test.mjs",
+        "tests/unit/services.test.mjs"
+      ]
+    },
+    {
+      "id": "M-MATCHER",
+      "kind": "simulator",
+      "path": "scripts/lib/st-matching.mjs",
+      "testFiles": [
+        "tests/unit/key-truth-table.test.mjs",
+        "tests/unit/russian-regex-fidelity.test.mjs"
+      ]
+    },
+    {
+      "id": "M-WI-SIMULATOR",
+      "kind": "simulator",
+      "path": "scripts/lib/world-info-simulator.mjs",
+      "testFiles": [
+        "tests/unit/world-info-official-semantics.test.mjs",
+        "tests/unit/world-info-simulator.test.mjs",
+        "tests/e2e/world-info-e2e.test.mjs",
+        "tests/sabotage/world-info-simulator-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-IMPORT-EXPORT",
+      "kind": "serializer",
+      "path": "scripts/lib/lorebook-io.mjs",
+      "testFiles": [
+        "tests/unit/lorebook-io.test.mjs",
+        "tests/e2e/world-info-e2e.test.mjs"
+      ]
+    },
+    {
+      "id": "M-EVIDENCE",
+      "kind": "validator",
+      "path": "scripts/lib/lorebook-evidence.mjs",
+      "testFiles": [
+        "tests/unit/lorebook-evidence.test.mjs",
+        "tests/unit/state-evidence.test.mjs",
+        "tests/sabotage/runtime-evidence-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-RUNTIME",
+      "kind": "runtime-adapter",
+      "path": "scripts/lib/lorebook-evidence.mjs",
+      "testFiles": [
+        "tests/unit/lorebook-evidence.test.mjs",
+        "tests/e2e/world-info-e2e.test.mjs",
+        "tests/sabotage/runtime-evidence-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-MANUAL",
+      "kind": "manual-gate",
+      "path": "rules/manual-gates.json",
+      "testFiles": [
+        "tests/unit/state-evidence.test.mjs",
+        "tests/unit/card-advisory.test.mjs",
+        "tests/sabotage/guide-coverage-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-ADVISORY",
+      "kind": "advisory",
+      "path": "references/lorebooks.md",
+      "testFiles": [
+        "tests/sabotage/guide-coverage-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-CARD-TOKEN-ADVISORY",
+      "kind": "validator",
+      "path": "scripts/services/tokens.mjs",
+      "testFiles": [
+        "tests/unit/card-advisory.test.mjs",
+        "tests/sabotage/card-advisory-sabotage.test.mjs"
+      ]
+    },
+    {
+      "id": "M-CARD-ADVISORY",
+      "kind": "advisory",
+      "path": "references/character-cards.md",
+      "testFiles": [
+        "tests/unit/card-advisory.test.mjs",
+        "tests/sabotage/card-advisory-sabotage.test.mjs"
+      ]
+    }
+  ]
+}

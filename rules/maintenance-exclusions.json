@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "checks": ["stale-route", "links", "npm-commands"],
+      "reason": "Repository owner explicitly reserved the Russian README for manual editing on 2026-07-10."
+    },
+    {
+      "path": "README_EN.md",
+      "checks": ["stale-route", "links", "npm-commands"],
+      "reason": "Repository owner explicitly reserved the English README for manual editing on 2026-07-10."
+    }
+  ]
+}

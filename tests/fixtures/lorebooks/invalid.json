@@ -1,0 +1,15 @@
+{
+  "name": "Invalid World Info fixture",
+  "entries": {
+    "bad": {
+      "uid": "not-an-integer",
+      "key": "archive",
+      "keysecondary": [4],
+      "content": "",
+      "selective": "yes",
+      "selectiveLogic": 9,
+      "order": 1.5,
+      "position": {}
+    }
+  }
+}
