@@ -21,7 +21,7 @@
     "rules/sources.json"
   ],
   "immutableFiles": {
-    "README.md": "dbaf3af8e643a8f01766741e74b506a3a69b3fdefef8349b9e6cb26c6a9b8512",
+    "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
     "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df"
   },
   "forbiddenTopLevel": [
@@ -45,7 +45,7 @@
     ".gitignore": "f10809bb4cf6f6980e4496aa2bc371da66d7a69cd0befd4f7cad52fec450a148",
     "AI_CHECK_INDEX.md": "7cc23fc9f70aaa700a890952b0211df403ef19aa6a30509a030423f92f57eba3",
     "LICENSE": "62fd604180bac6d73dbfe96bacd1978c58a5f4f698c92a74aabdc4685a730eec",
-    "README.md": "dbaf3af8e643a8f01766741e74b506a3a69b3fdefef8349b9e6cb26c6a9b8512",
+    "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
     "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df",
     "SKILL.md": "97d87cba2a750ff6de020727b22ec7868195ab1cb2c82cb4c562829ff687c095",
     "assets/character-card-template.json": "ceb758fde1949ef3b9f8497453d061717606bd924a87bb42efab8d8e1c4d26c9",
