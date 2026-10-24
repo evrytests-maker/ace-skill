@@ -81,7 +81,7 @@
     "rules/maintenance-exclusions.json": "bb51b8b6ff5e7dc30602362851eadd7ea9760b2d54d2756355555d3d6ab7cb93",
     "rules/manual-gates.json": "3ade465f79c9e29649862ea5d61f710b6a4d96e4229d8a2719c4ab15860cf62b",
     "rules/registry.json": "5adb5df5c740ad500d79449289d155bca196c24d8fb555a42d7689b2def9b2f8",
-    "rules/sources.json": "734ecb49621dd75a04c95212c8913a266cc89d92ae4315e6caf983a9dd0bd057",
+    "rules/sources.json": "c3ae4ca8e4cf85d4847c0bfd080ec17e5faaaf38b80c1c8873c787884092e3b8",
     "rules/workflows.json": "e849ec5bf33b095493603790f769466c04c0d403bdd4945f8e54e8bf128c65a3",
     "schemas/evidence.schema.json": "fdd3456c5587f8878cc0d6f7ff8be3cca38cf3997b1368b4faea973fb970686b",
     "schemas/language-exceptions.schema.json": "ada0fef1a26fb9e690ccea72ba7d6fbdf3b5f84acc882baf5f8c571a329dfd88",
