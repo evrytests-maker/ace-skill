@@ -21,8 +21,8 @@
     "rules/sources.json"
   ],
   "immutableFiles": {
-    "README.md": "dbaf3af8e643a8f01766741e74b506a3a69b3fdefef8349b9e6cb26c6a9b8512",
-    "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df"
+    "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
+    "README_EN.md": "002cddcd22c741ac4377c73943415439ff6227384b92b5fbc756c1de50bf0ed7"
   },
   "forbiddenTopLevel": [
     ".git",
@@ -45,8 +45,8 @@
     ".gitignore": "f10809bb4cf6f6980e4496aa2bc371da66d7a69cd0befd4f7cad52fec450a148",
     "AI_CHECK_INDEX.md": "7cc23fc9f70aaa700a890952b0211df403ef19aa6a30509a030423f92f57eba3",
     "LICENSE": "62fd604180bac6d73dbfe96bacd1978c58a5f4f698c92a74aabdc4685a730eec",
-    "README.md": "dbaf3af8e643a8f01766741e74b506a3a69b3fdefef8349b9e6cb26c6a9b8512",
-    "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df",
+    "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
+    "README_EN.md": "002cddcd22c741ac4377c73943415439ff6227384b92b5fbc756c1de50bf0ed7",
     "SKILL.md": "97d87cba2a750ff6de020727b22ec7868195ab1cb2c82cb4c562829ff687c095",
     "assets/character-card-template.json": "ceb758fde1949ef3b9f8497453d061717606bd924a87bb42efab8d8e1c4d26c9",
     "assets/lorebook_template.json": "19fa11152ed6fb9c806297593e7dc758762f5f99e7f92b7e682e34c9105e6d83",
@@ -81,7 +81,7 @@
     "rules/maintenance-exclusions.json": "bb51b8b6ff5e7dc30602362851eadd7ea9760b2d54d2756355555d3d6ab7cb93",
     "rules/manual-gates.json": "3ade465f79c9e29649862ea5d61f710b6a4d96e4229d8a2719c4ab15860cf62b",
     "rules/registry.json": "5adb5df5c740ad500d79449289d155bca196c24d8fb555a42d7689b2def9b2f8",
-    "rules/sources.json": "734ecb49621dd75a04c95212c8913a266cc89d92ae4315e6caf983a9dd0bd057",
+    "rules/sources.json": "c3ae4ca8e4cf85d4847c0bfd080ec17e5faaaf38b80c1c8873c787884092e3b8",
     "rules/workflows.json": "e849ec5bf33b095493603790f769466c04c0d403bdd4945f8e54e8bf128c65a3",
     "schemas/evidence.schema.json": "fdd3456c5587f8878cc0d6f7ff8be3cca38cf3997b1368b4faea973fb970686b",
     "schemas/language-exceptions.schema.json": "ada0fef1a26fb9e690ccea72ba7d6fbdf3b5f84acc882baf5f8c571a329dfd88",
