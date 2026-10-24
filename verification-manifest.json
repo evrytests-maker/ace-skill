@@ -22,7 +22,7 @@
   ],
   "immutableFiles": {
     "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
-    "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df"
+    "README_EN.md": "002cddcd22c741ac4377c73943415439ff6227384b92b5fbc756c1de50bf0ed7"
   },
   "forbiddenTopLevel": [
     ".git",
@@ -46,7 +46,7 @@
     "AI_CHECK_INDEX.md": "7cc23fc9f70aaa700a890952b0211df403ef19aa6a30509a030423f92f57eba3",
     "LICENSE": "62fd604180bac6d73dbfe96bacd1978c58a5f4f698c92a74aabdc4685a730eec",
     "README.md": "9883696943b0a06f451252d9adbfd0cec51aebd61082c32cca14eeaf7d3b6131",
-    "README_EN.md": "ec8fb3c641d01f82c4075880478ab86675e013ef38110d7538c76f21c22b77df",
+    "README_EN.md": "002cddcd22c741ac4377c73943415439ff6227384b92b5fbc756c1de50bf0ed7",
     "SKILL.md": "97d87cba2a750ff6de020727b22ec7868195ab1cb2c82cb4c562829ff687c095",
     "assets/character-card-template.json": "ceb758fde1949ef3b9f8497453d061717606bd924a87bb42efab8d8e1c4d26c9",
     "assets/lorebook_template.json": "19fa11152ed6fb9c806297593e7dc758762f5f99e7f92b7e682e34c9105e6d83",
