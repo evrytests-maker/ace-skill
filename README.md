@@ -112,7 +112,7 @@
 | Режим | Где | Что доступно |
 |---|---|---|
 | **Чат-бот** | ChatGPT, Claude.ai, Grok и другие веб-чаты | инструкции, справочники, ручные проверки; автоматические — только если чат умеет запускать Node.js |
-| **Агент** | Codex, Claude Code, Antigravity, Gemini CLI, OpenCode, Cursor, Cline, Roo Code | всё, включая `verify.mjs`, CLI, валидаторы и тесты |
+| **Агент** | Codex, Claude Code, Antigravity, OpenCode, Cursor, Cline, Roo Code | всё, включая `verify.mjs`, CLI, валидаторы и тесты |
 
 > [!TIP]
 > Полный автоматический `PASS` возможен только там, где модель реально может выполнять команды. В веб-чатах без исполнения кода честный итог для автоматических проверок — `BLOCKED`.
@@ -265,7 +265,7 @@ project/
 Не объявляй PASS без evidence.
 ```
 
-#### Gemini CLI, OpenCode, Cursor, Cline, Roo Code
+#### OpenCode, Cursor, Cline, Roo Code
 
 Склонируй `ace-skill` в корень рабочего проекта (или рядом с проверяемыми файлами):
 

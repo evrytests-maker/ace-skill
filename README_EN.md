@@ -112,7 +112,7 @@ First determine which mode you are working in:
 | Mode | Where | What is available |
 |---|---|---|
 | **Chatbot** | ChatGPT, Claude.ai, Grok, and other web chats | instructions, references, manual checks; automated checks only if the chat can run Node.js |
-| **Agent** | Codex, Claude Code, Antigravity, Gemini CLI, OpenCode, Cursor, Cline, Roo Code | everything, including `verify.mjs`, the CLI, validators, and tests |
+| **Agent** | Codex, Claude Code, Antigravity, OpenCode, Cursor, Cline, Roo Code | everything, including `verify.mjs`, the CLI, validators, and tests |
 
 > [!TIP]
 > A full automated `PASS` is possible only where the model can actually execute commands. In web chats without code execution, the honest result for automated checks is `BLOCKED`.
@@ -265,7 +265,7 @@ Select one suitable workflow, read only the files it allows, complete the task, 
 Do not declare PASS without evidence.
 ```
 
-#### Gemini CLI, OpenCode, Cursor, Cline, Roo Code
+#### OpenCode, Cursor, Cline, Roo Code
 
 Clone `ace-skill` into the root of the working project (or next to the files being checked):
 
