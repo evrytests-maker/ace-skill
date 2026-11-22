@@ -36,8 +36,8 @@ Runner contract:
   Optional extra runner args may be supplied as a JSON array in ACE_EVAL_RUNNER_ARGS.`);
 }
 
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+function readJson(file, root = ROOT) {
+  return JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 }
 
 function parseArgs(argv) {
@@ -67,7 +67,7 @@ function parseArgs(argv) {
   return options;
 }
 
-export function validateDatasets() {
+export function validateDatasets(root = ROOT) {
   const errors = [];
   let train;
   let validation;
@@ -75,34 +75,49 @@ export function validateDatasets() {
   let workflows;
   let registry;
   try {
-    train = readJson('evals/triggers.train.json').cases;
-    validation = readJson('evals/triggers.validation.json').cases;
-    behavior = readJson('evals/behavior.json').cases;
-    workflows = readJson('rules/workflows.json').workflows;
-    registry = readJson('rules/registry.json');
+    train = readJson('evals/triggers.train.json', root).cases;
+    validation = readJson('evals/triggers.validation.json', root).cases;
+    behavior = readJson('evals/behavior.json', root).cases;
+    workflows = readJson('rules/workflows.json', root).workflows;
+    registry = readJson('rules/registry.json', root);
   } catch (error) {
     return { errors: [error.message], counts: {} };
+  }
+  if (!Array.isArray(train) || !Array.isArray(validation) || !Array.isArray(behavior)) {
+    return { errors: ['evals datasets must contain cases arrays'], counts: {} };
   }
   const trigger = [...train, ...validation];
   if (train.length !== 20) errors.push(`trigger train count is ${train.length}, expected 20`);
   if (validation.length !== 12) errors.push(`trigger validation count is ${validation.length}, expected 12`);
   if (trigger.length !== 32) errors.push(`trigger total is ${trigger.length}, expected 32`);
-  if (new Set(trigger.map((item) => item.id)).size !== trigger.length) errors.push('trigger IDs are not unique');
-  if (trigger.filter((item) => item.shouldTrigger === true).length !== 16) errors.push('trigger positives must total 16');
-  if (trigger.filter((item) => item.shouldTrigger === false).length !== 16) errors.push('trigger negatives must total 16');
+  if (new Set(trigger.map((item) => item?.id)).size !== trigger.length) errors.push('trigger IDs are not unique');
+  if (trigger.filter((item) => item?.shouldTrigger === true).length !== 16) errors.push('trigger positives must total 16');
+  if (trigger.filter((item) => item?.shouldTrigger === false).length !== 16) errors.push('trigger negatives must total 16');
   for (const [name, rows] of [['train', train], ['validation', validation]]) {
-    if (rows.filter((item) => item.shouldTrigger === true).length !== rows.length / 2) errors.push(`${name} is not balanced`);
+    if (rows.filter((item) => item?.shouldTrigger === true).length !== rows.length / 2) errors.push(`${name} is not balanced`);
     for (const item of rows) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        errors.push(`${name} entry must be an object`);
+        continue;
+      }
       if (!item.id || typeof item.query !== 'string' || typeof item.shouldTrigger !== 'boolean' || !item.category || !item.rationale) errors.push(`${name}/${item.id ?? '?'} is incomplete`);
     }
   }
   for (const category of ['typo', 'near-miss', 'buried', 'multi-step', 'colloquial']) {
-    if (!trigger.some((item) => item.category === category)) errors.push(`trigger corpus misses ${category}`);
+    if (!trigger.some((item) => item?.category === category)) errors.push(`trigger corpus misses ${category}`);
   }
   if (behavior.length !== 20) errors.push(`behavior count is ${behavior.length}, expected 20`);
-  if (new Set(behavior.map((item) => item.id)).size !== behavior.length) errors.push('behavior IDs are not unique');
+  if (new Set(behavior.map((item) => item?.id)).size !== behavior.length) errors.push('behavior IDs are not unique');
   const repeatedAdversarial = new Set(['B07-SELECTIVE-LOGIC', 'B15-FAIL-NOT-PASS', 'B17-NEAR-MISS-NO-TRIGGER']);
   for (const item of behavior) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      errors.push('behavior entry must be an object');
+      continue;
+    }
+    const requiredReferences = Array.isArray(item.requiredReferences) ? item.requiredReferences : [];
+    const forbiddenReferences = Array.isArray(item.forbiddenReferences) ? item.forbiddenReferences : [];
+    const requiredValidators = Array.isArray(item.requiredValidators) ? item.requiredValidators : [];
+    const requiredRules = Array.isArray(item.requiredRules) ? item.requiredRules : [];
     for (const field of REQUIRED_BEHAVIOR_FIELDS) if (!Object.hasOwn(item, field)) errors.push(`${item.id ?? '?'} misses ${field}`);
     for (const field of ['requiredReferences', 'forbiddenReferences', 'requiredRules', 'requiredValidators', 'requiredOutputs', 'assertions', 'prohibitedBehavior', 'evidence']) {
       if (!Array.isArray(item[field])) errors.push(`${item.id ?? '?'}/${field} must be an array`);
@@ -114,24 +129,25 @@ export function validateDatasets() {
       const workflow = workflows.find((candidate) => candidate.id === item.requiredWorkflow);
       if (!workflow) errors.push(`${item.id ?? '?'} has unknown requiredWorkflow ${item.requiredWorkflow}`);
       else {
-        for (const reference of workflow.requiredReferences) if (!item.requiredReferences.includes(reference)) errors.push(`${item.id} misses workflow reference ${reference}`);
-        for (const reference of workflow.forbiddenReferences) if (!item.forbiddenReferences.includes(reference)) errors.push(`${item.id} misses forbidden reference ${reference}`);
-        for (const validator of workflow.validators) if (!item.requiredValidators.includes(validator)) errors.push(`${item.id} misses workflow validator ${validator}`);
-        for (const rule of item.requiredRules) if (rule !== 'ACE-TRIGGER-001' && !workflow.rules.includes(rule)) errors.push(`${item.id} requires ${rule}, which is outside ${workflow.id}`);
+        for (const reference of workflow.requiredReferences) if (!requiredReferences.includes(reference)) errors.push(`${item.id} misses workflow reference ${reference}`);
+        for (const reference of workflow.forbiddenReferences) if (!forbiddenReferences.includes(reference)) errors.push(`${item.id} misses forbidden reference ${reference}`);
+        for (const validator of workflow.validators) if (!requiredValidators.includes(validator)) errors.push(`${item.id} misses workflow validator ${validator}`);
+        for (const rule of requiredRules) if (rule !== 'ACE-TRIGGER-001' && !workflow.rules.includes(rule)) errors.push(`${item.id} requires ${rule}, which is outside ${workflow.id}`);
       }
-    } else if (item.requiredWorkflow !== null || item.requiredReferences.length || item.requiredValidators.length || item.requiredRules.some((rule) => rule !== 'ACE-TRIGGER-001')) {
+    } else if (item.requiredWorkflow !== null || requiredReferences.length || requiredValidators.length || requiredRules.some((rule) => rule !== 'ACE-TRIGGER-001')) {
       errors.push(`${item.id ?? '?'} is a non-trigger case but declares ACE workflow requirements`);
     }
     const validatorIds = new Set(registry.validators.map((candidate) => candidate.id));
     const ruleIds = new Set(registry.rules.map((candidate) => candidate.id));
-    for (const validator of item.requiredValidators) if (!validatorIds.has(validator)) errors.push(`${item.id} references unknown validator ${validator}`);
-    for (const rule of item.requiredRules) if (!ruleIds.has(rule)) errors.push(`${item.id} references unknown rule ${rule}`);
-    for (const match of item.prompt.matchAll(/\binputs\/([a-z0-9-]+\.json)\b/gu)) {
-      const input = path.join(ROOT, 'evals/inputs', match[1]);
+    for (const validator of requiredValidators) if (!validatorIds.has(validator)) errors.push(`${item.id} references unknown validator ${validator}`);
+    for (const rule of requiredRules) if (!ruleIds.has(rule)) errors.push(`${item.id} references unknown rule ${rule}`);
+    const prompt = typeof item.prompt === 'string' ? item.prompt : '';
+    for (const match of prompt.matchAll(/\binputs\/([a-z0-9-]+\.json)\b/gu)) {
+      const input = path.join(root, 'evals/inputs', match[1]);
       if (!fs.existsSync(input)) errors.push(`${item.id} references missing evaluation input inputs/${match[1]}`);
     }
   }
-  const inputDirectory = path.join(ROOT, 'evals/inputs');
+  const inputDirectory = path.join(root, 'evals/inputs');
   if (!fs.existsSync(inputDirectory)) errors.push('evals/inputs is missing');
   else {
     for (const name of fs.readdirSync(inputDirectory).filter((item) => item.endsWith('.json'))) {
@@ -209,7 +225,7 @@ async function exportBaseline(ref, tempRoot) {
     const reason = archive.error?.message ?? (archive.timedOut ? 'timed out' : 'output exceeded the safety limit');
     throw Object.assign(new Error(`git archive is unavailable: ${reason}`), { blocked: true });
   }
-  if (archive.status !== 0) throw new Error(`git archive ${ref} failed: ${archive.stderr.trim() || archive.status}`);
+  if (archive.status !== 0) throw Object.assign(new Error(`git archive ${ref} failed: ${archive.stderr.trim() || archive.status}`), { blocked: true });
   const extract = await runProcess('tar', ['-x', '-C', destination], {
     input: archive.stdoutBuffer,
     timeoutMs: 60_000,
@@ -240,6 +256,17 @@ const TRIGGER_SCHEMA = {
   },
   additionalProperties: false,
 };
+
+export function isValidTriggerResponse(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const keys = Object.keys(value);
+  return keys.length === 3
+    && keys.every((key) => ['triggered', 'skills', 'reason'].includes(key))
+    && typeof value.triggered === 'boolean'
+    && Array.isArray(value.skills)
+    && value.skills.every((skill) => typeof skill === 'string')
+    && typeof value.reason === 'string';
+}
 
 const GRADE_SCHEMA = {
   type: 'object',
@@ -375,8 +402,8 @@ function metrics(rows) {
 
 async function runTriggerVersion(options, version, workspace, tempRoot) {
   const splits = {
-    train: readJson('evals/triggers.train.json').cases,
-    validation: readJson('evals/triggers.validation.json').cases,
+    train: readJson('evals/triggers.train.json', ROOT).cases,
+    validation: readJson('evals/triggers.validation.json', ROOT).cases,
   };
   const output = { version, runsPerQuery: options.runs, cases: [], metrics: {} };
   for (const [split, cases] of Object.entries(splits)) {
@@ -389,8 +416,8 @@ async function runTriggerVersion(options, version, workspace, tempRoot) {
           tempRoot, label: `trigger-${version}-${item.id}-${attempt}`,
         });
         if (result.blocked) return { blocked: true, reason: `${item.id}/${attempt}: ${result.reason}`, partial: output };
-        const actual = result.parsed?.triggered === true && (result.parsed.skills ?? []).some((skill) => /ace-skill|ace skill/i.test(skill));
-        const validResponse = result.parsed !== null;
+        const validResponse = isValidTriggerResponse(result.parsed);
+        const actual = validResponse && result.parsed.triggered === true && result.parsed.skills.some((skill) => /ace-skill|ace skill/i.test(skill));
         rows.push({ expected: item.shouldTrigger, actual: validResponse ? actual : !item.shouldTrigger });
         attempts.push({ attempt, expected: item.shouldTrigger, actual: validResponse ? actual : null, pass: validResponse && actual === item.shouldTrigger, reason: result.parsed?.reason ?? 'invalid JSON response', command: result.command, exitCode: result.exitCode });
       }
@@ -450,7 +477,7 @@ function gradeContract(item, parsed) {
 }
 
 async function runBehaviorVersion(options, version, workspace, graderWorkspace, tempRoot) {
-  const cases = readJson('evals/behavior.json').cases;
+  const cases = readJson('evals/behavior.json', ROOT).cases;
   const output = { version, cases: [] };
   for (const item of cases) {
     const repetitions = item.repetitions ?? 1;
@@ -523,7 +550,8 @@ export async function main(argv = process.argv.slice(2)) {
   let options;
   try { options = parseArgs(argv); } catch (error) { console.error(`ERROR: ${error.message}`); usage(); return EXIT.USAGE; }
   if (options.help) { usage(); return EXIT.PASS; }
-  const data = validateDatasets();
+  let data;
+  try { data = validateDatasets(); } catch (error) { console.error(`FAIL: eval data\n  - ${error.message}`); return EXIT.FAIL; }
   if (data.errors.length) {
     console.error(`FAIL: eval data\n${data.errors.map((error) => `  - ${error}`).join('\n')}`);
     return EXIT.FAIL;
