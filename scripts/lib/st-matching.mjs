@@ -69,6 +69,9 @@ export function parseRegexLiteral(value) {
 
   if (end <= 0) return null;
   const pattern = raw.slice(1, end);
+  // SillyTavern's parseRegexFromString requires a non-empty pattern and
+  // rejects unescaped internal delimiters; such keys remain plaintext.
+  if (!pattern || /(^|[^\\])\//.test(pattern)) return null;
   const flags = raw.slice(end + 1);
   if (!REGEX_FLAG_PATTERN.test(flags)) {
     throw new Error(`Invalid JavaScript regex flags: ${flags}`);
@@ -100,7 +103,7 @@ export function normalizeForCase(text, caseSensitive) {
 export function hasOnlyOneWord(key) {
   const trimmed = String(key ?? '').trim();
   if (!trimmed) return false;
-  return !/[\s,;|/()[\]{}]+/u.test(trimmed);
+  return trimmed.split(/\s+/u).length === 1;
 }
 
 export function matchPlainKey(key, text, { caseSensitive = false, wholeWords = true, macros = {} } = {}) {
@@ -111,7 +114,9 @@ export function matchPlainKey(key, text, { caseSensitive = false, wholeWords = t
 
   if (wholeWords && hasOnlyOneWord(sourceKey)) {
     const escaped = escapeRegExp(activeKey);
-    const re = new RegExp(`(?<![\\p{L}\\p{N}_])${escaped}(?![\\p{L}\\p{N}_])`, 'u');
+    // SillyTavern's release matcher uses ASCII \W boundaries, not Unicode
+    // property escapes. See G-KEY-003 in the bundled guide.
+    const re = new RegExp(`(?:^|\\W)${escaped}(?:$|\\W)`);
     return re.test(haystack);
   }
   return haystack.includes(activeKey);
