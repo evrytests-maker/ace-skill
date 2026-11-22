@@ -147,3 +147,22 @@ test('signed release hashes detect modified skill files inside a valid ZIP', () 
   assert.ok(report.bundles[0].skills[0].checks.some((row) => row.id === 'WEB-RELEASE-HASHES' && row.status === 'FAIL'));
   fs.rmSync(directory, { recursive: true, force: true });
 });
+
+test('ZIP comment containing an EOCD signature cannot spoof an empty archive', () => {
+  const archive = zipStore([['ace-skill/SKILL.md', '---\nname: ace-skill\ndescription: fixture\n---\n']]);
+  const eocd = archive.length - 22;
+  const comment = Buffer.alloc(22);
+  comment.writeUInt32LE(0x06054b50, 0);
+  comment.writeUInt32LE(archive.length, 16);
+  const commented = Buffer.from(archive);
+  commented.writeUInt16LE(comment.length, eocd + 20);
+  const parsed = parseZipArchive(Buffer.concat([commented, comment]), 'comment.zip');
+  assert.ok(parsed.files.has('ace-skill/SKILL.md'));
+});
+
+test('ZIP with an unclaimed trailing comment is rejected', () => {
+  const archive = zipStore([['ace-skill/SKILL.md', '---\nname: ace-skill\n---\n']]);
+  const comment = Buffer.alloc(22);
+  comment.writeUInt32LE(0x06054b50, 0);
+  assert.throws(() => parseZipArchive(Buffer.concat([archive, comment]), 'trailing.zip'), /end-of-central-directory/u);
+});

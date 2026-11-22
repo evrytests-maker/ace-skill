@@ -60,10 +60,21 @@ function decodeZipName(buffer, flags) {
 function findEndOfCentralDirectory(buffer) {
   const minimum = Math.max(0, buffer.length - 65_557);
   for (let offset = buffer.length - 22; offset >= minimum; offset -= 1) {
-    if (buffer.readUInt32LE(offset) === ZIP_END_OF_CENTRAL_DIRECTORY) return offset;
     if (buffer.readUInt32LE(offset) === ZIP64_END_OF_CENTRAL_DIRECTORY) {
       throw new Error('ZIP64 archives are not supported by the dependency-free web precheck');
     }
+    if (buffer.readUInt32LE(offset) !== ZIP_END_OF_CENTRAL_DIRECTORY) continue;
+    const commentLength = buffer.readUInt16LE(offset + 20);
+    if (offset + 22 + commentLength !== buffer.length) continue;
+    const centralSize = buffer.readUInt32LE(offset + 12);
+    const centralOffset = buffer.readUInt32LE(offset + 16);
+    // The central directory must end exactly where this record starts. This
+    // rejects an EOCD signature embedded in a ZIP comment, which could
+    // otherwise spoof an empty archive.
+    if (centralOffset + centralSize !== offset) continue;
+    const entryCount = buffer.readUInt16LE(offset + 10);
+    if (entryCount === 0 && (centralOffset !== 0 || centralSize !== 0 || offset !== 0)) continue;
+    return offset;
   }
   throw new Error('ZIP end-of-central-directory record was not found');
 }
