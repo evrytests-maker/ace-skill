@@ -83,3 +83,16 @@ test('unknown SRC token in an active source document fails closed', (t) => {
   fs.appendFileSync(path.join(root, 'references/character-cards.md'), '\n`SRC-NOT-REGISTERED`\n');
   assert.match(validateSources(root).errors.join('\n'), /ACE-REPO-005 active source document references unknown source ID: references\/character-cards\.md: SRC-NOT-REGISTERED/);
 });
+
+test('impossible calendar dates fail source validation', (t) => {
+  const root = makeRepoFixture();
+  t.after(() => removeFixture(root));
+  const sources = readJson('rules/sources.json', root);
+  sources.sources[0].checkedAt = '2025-99-99';
+  writeJson('rules/sources.json', sources, root);
+  assert.match(validateSources(root).errors.join('\n'), /invalid review dates/);
+
+  sources.sources[0].checkedAt = '2025-02-29';
+  writeJson('rules/sources.json', sources, root);
+  assert.match(validateSources(root).errors.join('\n'), /invalid review dates/);
+});

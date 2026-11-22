@@ -230,6 +230,15 @@ function localCalendarDate(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function validCalendarDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  return day <= days;
+}
+
 export function validateSources(root = SKILL_ROOT, today = localCalendarDate()) {
   const out = result('VAL-SOURCES');
   let data;
@@ -243,7 +252,7 @@ export function validateSources(root = SKILL_ROOT, today = localCalendarDate()) 
   for (const source of data.sources ?? []) {
     if (seen.has(source.id)) out.errors.push(`Duplicate source: ${source.id}`);
     seen.add(source.id);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(source.checkedAt) || !/^\d{4}-\d{2}-\d{2}$/.test(source.reviewDue)) out.errors.push(`${source.id} has invalid review dates`);
+    if (!validCalendarDate(source.checkedAt) || !validCalendarDate(source.reviewDue)) out.errors.push(`${source.id} has invalid review dates`);
     else {
       if (source.checkedAt > today) out.errors.push(`${source.id} claims a future check date ${source.checkedAt}`);
       if (source.reviewDue < source.checkedAt) out.errors.push(`${source.id} reviewDue precedes checkedAt`);
