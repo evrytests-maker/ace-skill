@@ -149,11 +149,11 @@
     "tests/unit/services.test.mjs": "c1d99c82af13fc65d486d899e5eea883c820cdcf5e88b396c390696ea93faf59",
     "tests/unit/state-evidence.test.mjs": "60295a41dce76f635075dcbf544dda0d5b867ce6bff171b3249f868e38591a4d",
     "tests/unit/style-ban.test.mjs": "3f5f2852ac241b2d51515b909ccd3d55645e34f9e1b618e23f5f56ef45924fbb",
-    "tests/unit/web-precheck.test.mjs": "8fd346ca00c770673c1957b449287c24fd2cd6f5aaa74a7e4cd621e457fcce14",
+    "tests/unit/web-precheck.test.mjs": "1028de7c75e318ec968858e9fac0ef2462900c19eb6e62cdf8bf996fdbb42ffe",
     "tests/unit/world-info-official-semantics.test.mjs": "39e3832dff2786f0f9d9e254adfdc75898a2f60c98d7abfa6a0794c4912f3e3b",
     "tests/unit/world-info-simulator.test.mjs": "8114a258d6d1e82ac3f61d5729d7937868c08dbdc7067fe4cfa416078f67fb9f",
     "upstream/OFFICIAL-SILLYTAVERN-REFERENCE.md": "1d551d12a9a638fae335f3157a6f049cd77a2f05ca4d25578a0d64a5c9fca1d3",
-    "verify.mjs": "e81df5afc0f3af7fdc0f27acffac14438e6b2de3b9208310300c9cb62e1ffff1",
+    "verify.mjs": "6899124962cc4cc0e200ac0904de1e17f00c6b7be6bda222068ee5d2c83f72ea",
     "assets/github-download-zip-v5.png": "b5efb6a880a86864e2246229776fd997345662ecd890562973becc4c0b0d8067"
   }
 }
