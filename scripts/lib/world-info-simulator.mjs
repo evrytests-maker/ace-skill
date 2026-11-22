@@ -906,8 +906,10 @@ function applyGroups(candidates, prng, trace, settings, activatedGroups) {
     }
 
     const scoringMembers = members.filter((candidate) => resolvedGroupScoring(candidate.entry, settings));
-    const maxScore = scoringMembers.length
-      ? Math.max(...scoringMembers.map((candidate) => candidate.matching?.score ?? 0))
+    // Release code compares scoring members against the highest score of all
+    // members, including members excluded from scoring.
+    const maxScore = members.length
+      ? Math.max(...members.map((candidate) => candidate.matching?.score ?? 0))
       : null;
     for (const candidate of [...scoringMembers]) {
       if ((candidate.matching?.score ?? 0) < maxScore) {
@@ -1172,6 +1174,7 @@ function basePromptSkeleton(input) {
 function placeEntries(included, input, trace) {
   const segments = [];
   const outletEntries = {};
+  const outletGroups = new Map();
   const sorted = [...included].sort((a, b) => activationCompare(a, b, trace.settings.sourceStrategy));
   for (const candidate of sorted) {
     const entry = candidate.entry;
@@ -1181,8 +1184,8 @@ function placeEntries(included, input, trace) {
         trace.outlets.skipped.push({ entryId: entry.id, reason: 'OUTLET_NAME_MISSING' });
         continue;
       }
-      if (!outletEntries[key]) outletEntries[key] = [];
-      outletEntries[key].push(entry.content);
+      if (!outletGroups.has(key)) outletGroups.set(key, []);
+      outletGroups.get(key).push(entry);
       trace.outlets.entries.push({ entryId: entry.id, outletName: key, order: entry.order });
       continue;
     }
@@ -1212,6 +1215,17 @@ function placeEntries(included, input, trace) {
       position: entry.position,
       depth: segment.depth,
       role: entry.role,
+    });
+  }
+  for (const [key, entries] of outletGroups) {
+    entries.sort((a, b) => (b.order - a.order)
+      || (a.index - b.index)
+      || String(a.id).localeCompare(String(b.id)));
+    Object.defineProperty(outletEntries, key, {
+      value: entries.map((entry) => entry.content),
+      enumerable: true,
+      configurable: true,
+      writable: true,
     });
   }
   trace.outlets.values = outletEntries;
@@ -1281,7 +1295,8 @@ function automationEvents(included, input, trace, settings) {
   const adapter = input.automationAdapter ?? input.automation_adapter;
   const seen = new Set();
   const events = [];
-  for (const candidate of [...included].sort((a, b) => activationCompare(a, b, settings.sourceStrategy))) {
+  for (const candidate of [...included].sort((a, b) => (a.level - b.level)
+    || activationCompare(a, b, settings.sourceStrategy))) {
     const automationId = candidate.entry.automationId.trim();
     if (!automationId || seen.has(automationId)) continue;
     seen.add(automationId);

@@ -367,3 +367,65 @@ for (const scenario of [
     assert.ok(result.errors.some((error) => error.code === scenario.code));
   });
 }
+
+test('official Outlet storage is safe for prototype-like names', () => {
+  const result = simulateWorldInfo({
+    systemPrompt: '{{outlet::toString}}|{{outlet::__proto__}}',
+    lorebook: {
+      entries: [
+        entry(1, { constant: true, position: 'outlet', outletName: 'toString', content: 'proto-safe' }),
+        entry(2, { constant: true, position: 'outlet', outletName: '__proto__', content: 'constructor-safe' }),
+      ],
+    },
+  });
+  assert.equal(result.status, 'PASS');
+  assert.equal(Object.hasOwn(result.outletEntries, 'toString'), true);
+  assert.deepEqual([...result.outletEntries.toString], ['proto-safe']);
+  assert.equal(Object.hasOwn(result.outletEntries, '__proto__'), true);
+  assert.equal(result.simulatedRawPrompt.find((row) => row.source === 'systemPrompt').content,
+    'proto-safe|constructor-safe');
+});
+
+test('official Outlet contents sort by descending Order regardless of activation bucket', () => {
+  const result = simulateWorldInfo({
+    history: ['trigger'],
+    lorebook: {
+      entries: [
+        entry(1, { constant: true, position: 'outlet', outletName: 'Memory', order: 100, content: 'low' }),
+        entry(2, { key: ['trigger'], position: 'outlet', outletName: 'Memory', order: 900, content: 'high' }),
+      ],
+    },
+  });
+  assert.deepEqual([...result.outletEntries.Memory], ['high', 'low']);
+});
+
+test('official Group Scoring compares scoring members against all member scores', () => {
+  const result = simulateWorldInfo({
+    history: ['head extra'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['head'], group: 'g', useGroupScoring: true, groupWeight: 100 }),
+        entry(2, { key: ['head', 'extra'], group: 'g', useGroupScoring: false, groupWeight: 1 }),
+      ],
+    },
+  });
+  const group = result.trace.groups[0];
+  assert.deepEqual(group.removed.filter((row) => row.reason === 'GROUP_SCORE_LOWER'), [
+    { id: '1', reason: 'GROUP_SCORE_LOWER' },
+  ]);
+  assert.equal(group.winner, '2');
+});
+
+test('official Automation order places direct activations before recursive ones', () => {
+  const result = simulateWorldInfo({
+    history: ['start'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['start'], order: 10, automationId: 'direct', content: 'alpha' }),
+        entry(2, { key: ['alpha'], order: 900, automationId: 'recursive', content: 'beta' }),
+      ],
+    },
+    settings: { recursiveScanning: true, maxRecursionDepth: 8 },
+  });
+  assert.deepEqual(result.trace.automation.map((event) => event.automationId), ['direct', 'recursive']);
+});
