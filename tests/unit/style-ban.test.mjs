@@ -71,3 +71,18 @@ test('passes prose without the banned construction and rejects inputs with no pr
   assert.equal(empty.status, 'FAIL');
   assert.equal(empty.errors[0].code, 'STYLE_NO_PROSE');
 });
+
+test('style scan covers V3 group-only greetings', () => {
+  const artifact = {
+    spec: 'chara_card_v3',
+    data: {
+      name: 'Mira',
+      description: 'A guard at the archive.',
+      group_only_greetings: ['She is not a guard, she is a jailer.'],
+    },
+  };
+  const fields = collectStyleSegments(artifact).map((item) => item.field);
+  assert.ok(fields.includes('data.group_only_greetings[0]'));
+  const result = validateStyle(artifact);
+  assert.equal(result.status, 'FAIL');
+});

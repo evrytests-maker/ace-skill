@@ -41,8 +41,10 @@ export function collectTokenFields(artifact) {
   for (const field of ['name', 'description', 'personality', 'scenario', 'first_mes', 'mes_example', 'creator_notes', 'system_prompt', 'post_history_instructions']) {
     pushString(rows, card === artifact ? field : `data.${field}`, card[field]);
   }
-  if (Array.isArray(card.alternate_greetings)) {
-    card.alternate_greetings.forEach((value, index) => pushString(rows, `${card === artifact ? '' : 'data.'}alternate_greetings[${index}]`, value));
+  for (const field of ['alternate_greetings', 'group_only_greetings']) {
+    if (Array.isArray(card[field])) {
+      card[field].forEach((value, index) => pushString(rows, `${card === artifact ? '' : 'data.'}${field}[${index}]`, value));
+    }
   }
 
   const visited = new Set();
