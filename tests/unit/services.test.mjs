@@ -3,7 +3,7 @@ import test from 'node:test';
 import {
   auditSecondaryArtifact,
   auditTokenBudget,
-  checkLorebookActivation,
+  checkLorebookActivation, collectTokenFields,
   testKey,
   validateCard,
   validateLorebook,
@@ -90,4 +90,13 @@ test('token service enumerates object entries and discloses estimated method', a
   assert.equal(result.data.exact, false);
   assert.ok(result.data.rows.some((row) => row.field === 'entries[0].content'));
   assert.ok(result.data.rows.every((row) => row.method.kind === 'estimate'));
+});
+
+test('token field collection covers V3 group-only greetings', () => {
+  const artifact = {
+    spec: 'chara_card_v3',
+    data: { name: 'Mira', description: 'A guard at the archive.', group_only_greetings: ['Group-only greeting text.'] },
+  };
+  const fields = collectTokenFields(artifact).map((row) => row.field);
+  assert.ok(fields.includes('data.group_only_greetings[0]'));
 });

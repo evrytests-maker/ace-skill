@@ -53,8 +53,10 @@ export function collectStyleSegments(artifact) {
   const card = isPlainObject(artifact.data) ? artifact.data : artifact;
   const prefix = card === artifact ? '' : 'data.';
   for (const field of CARD_PROSE_FIELDS) pushSegment(segments, `${prefix}${field}`, card[field]);
-  if (Array.isArray(card.alternate_greetings)) {
-    card.alternate_greetings.forEach((value, index) => pushSegment(segments, `${prefix}alternate_greetings[${index}]`, value));
+  for (const field of ['alternate_greetings', 'group_only_greetings']) {
+    if (Array.isArray(card[field])) {
+      card[field].forEach((value, index) => pushSegment(segments, `${prefix}${field}[${index}]`, value));
+    }
   }
 
   const containers = [
