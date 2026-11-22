@@ -68,3 +68,12 @@ test("runProcess timeout terminates the child process tree", { skip: process.pla
     fs.rmSync(temp, { recursive: true, force: true });
   }
 });
+
+test("runProcess survives a child that exits before consuming large input", async () => {
+  const result = await runProcess(process.execPath, ["-e", "process.exit(0)"], {
+    input: "x".repeat(16 * 1024 * 1024),
+    timeoutMs: 10_000,
+  });
+  assert.equal(result.error, null);
+  assert.equal(result.status, 0);
+});
