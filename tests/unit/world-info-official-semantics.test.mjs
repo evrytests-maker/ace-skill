@@ -367,3 +367,57 @@ for (const scenario of [
     assert.ok(result.errors.some((error) => error.code === scenario.code));
   });
 }
+
+test('official probability is rolled after inclusion groups', () => {
+  const result = simulateWorldInfo({
+    seed: 1,
+    history: ['head'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['head'], group: 'g', groupOverride: true, order: 100, probability: 0 }),
+        entry(2, { key: ['head'], group: 'g', groupWeight: 1, probability: 100 }),
+      ],
+    },
+  });
+  assert.deepEqual(result.includedEntryIds, []);
+  assert.equal(result.trace.groups[0].winner, '1');
+  assert.equal(result.trace.probability.find((row) => row.entryId === '1')?.passed, false);
+  assert.equal(result.trace.probability.some((row) => row.entryId === '2'), false);
+});
+
+test('official failed probability is not re-rolled in a later recursion wave', () => {
+  const result = simulateWorldInfo({
+    seed: 5,
+    history: ['go start'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['start'], probability: 0, content: 'alpha' }),
+        entry(2, { key: ['go'], probability: 100, content: 'start' }),
+      ],
+    },
+    settings: { recursiveScanning: true, maxRecursionDepth: 8 },
+  });
+  assert.deepEqual(result.includedEntryIds, ['2']);
+  assert.equal(result.trace.probability.filter((row) => row.entryId === '1').length, 1);
+});
+
+test('official budget overflow skips later non-ignore entries but keeps ignoreBudget entries', () => {
+  const sizes = { big: 12, small: 1, later: 1, keep: 1 };
+  const result = simulateWorldInfo({
+    history: ['k'],
+    tokenCounter: (content) => sizes[content],
+    budgetPolicy: { budget: 10 },
+    lorebook: {
+      entries: [
+        entry(1, { key: ['k'], order: 40, content: 'big' }),
+        entry(2, { key: ['k'], order: 30, content: 'small' }),
+        entry(3, { key: ['k'], order: 20, content: 'later' }),
+        entry(4, { key: ['k'], order: 10, content: 'keep', ignoreBudget: true }),
+      ],
+    },
+  });
+  assert.deepEqual(result.includedEntryIds, ['4']);
+  assert.ok(result.trace.budget
+    .filter((row) => ['1', '2', '3'].includes(row.entryId))
+    .every((row) => row.reason === 'BUDGET_EXCEEDED'));
+});
