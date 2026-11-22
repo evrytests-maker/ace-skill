@@ -367,3 +367,15 @@ for (const scenario of [
     assert.ok(result.errors.some((error) => error.code === scenario.code));
   });
 }
+
+test('official simulation fails closed when the token counter throws', () => {
+  const result = simulateWorldInfo({
+    history: ['k'],
+    tokenCounter: () => { throw new Error('tokenizer offline'); },
+    lorebook: { entries: [entry(1, { key: ['k'] })] },
+  });
+  assert.equal(result.status, 'FAIL');
+  assert.deepEqual(result.includedEntryIds, []);
+  assert.ok(result.errors.some((error) => error.code === 'TOKEN_COUNTER_INVALID'
+    && error.message.includes('tokenizer offline')));
+});

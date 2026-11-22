@@ -1564,7 +1564,18 @@ export function simulateWorldInfo(input = {}) {
     const insertedThisWave = [];
     for (const candidate of [...selected].sort((a, b) => activationCompare(a, b, settings.sourceStrategy))) {
       trace.candidates.push(summary(candidate, 'ELIGIBLE'));
-      const tokens = Number(tokenCounter(candidate.entry.content));
+      let tokens;
+      try {
+        tokens = Number(tokenCounter(candidate.entry.content));
+      } catch (error) {
+        errors.push({
+          code: 'TOKEN_COUNTER_INVALID',
+          entryId: candidate.entry.id,
+          message: `token counter failed: ${error.message}`,
+        });
+        updateCandidate(trace, candidate.entry.id, 'REJECTED', 'TOKEN_COUNTER_INVALID');
+        continue;
+      }
       if (!Number.isFinite(tokens) || tokens < 0) {
         errors.push({ code: 'TOKEN_COUNTER_INVALID', entryId: candidate.entry.id });
         updateCandidate(trace, candidate.entry.id, 'REJECTED', 'TOKEN_COUNTER_INVALID');
