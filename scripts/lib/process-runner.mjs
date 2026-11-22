@@ -110,6 +110,12 @@ export async function runProcess(command, args = [], options = {}) {
     });
     child.once("close", (status, signal) => finish(status, signal));
 
+    // A child may exit or close stdin before consuming all input; the write
+    // then fails with EPIPE. That is not a runner failure, so surface only
+    // unexpected stdin errors.
+    child.stdin.on("error", (error) => {
+      if (error?.code !== "EPIPE" && !spawnError) spawnError = error;
+    });
     if (input === undefined || input === null) child.stdin.end();
     else child.stdin.end(input);
 
