@@ -182,3 +182,10 @@ test('N/A is accepted only with policy and evidence', () => {
   assert.match(errors, /N\/A without reason/);
   assert.match(errors, /non-optional ACE-CORE-001 N\/A/);
 });
+
+test('schema-invalid ledgers fail with schema errors instead of throwing', () => {
+  const malformed = { workflowId: 'x', gates: [{ artifacts: [{}] }] };
+  const result = validateEvidence(malformed, ROOT);
+  assert.ok(result.errors.length > 0);
+  assert.ok(result.errors.some((error) => error.includes('evidence')));
+});

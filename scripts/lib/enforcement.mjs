@@ -480,7 +480,9 @@ function validTransitionSequence(transitions) {
 export function validateEvidence(ledger, root = SKILL_ROOT) {
   const out = result('VAL-EVIDENCE');
   const schema = compileSchema('schemas/evidence.schema.json', root, out);
-  if (schema && !schema(ledger)) addSchemaErrors(out, 'evidence', schema);
+  if (!schema) return out;
+  if (!schema(ledger)) addSchemaErrors(out, 'evidence', schema);
+  if (!ledger || typeof ledger !== 'object' || Array.isArray(ledger)) return out;
   let registry;
   let workflows;
   let manual;
@@ -562,16 +564,28 @@ export function validateEvidence(ledger, root = SKILL_ROOT) {
     if (!record) out.errors.push(`Missing required reference evidence: ${ref}`);
   }
   for (const ref of forbiddenReferences) if (loadedRefs.has(ref)) out.errors.push(`Forbidden reference was loaded: ${ref}`);
+  const gates = [];
+  for (const gate of Array.isArray(ledger.gates) ? ledger.gates : []) {
+    if (!gate || typeof gate !== 'object' || Array.isArray(gate)) {
+      out.errors.push('Gate evidence record must be an object');
+      continue;
+    }
+    gates.push(gate);
+  }
   const gateRecords = new Map();
-  for (const gate of ledger.gates ?? []) {
+  for (const gate of gates) {
     const key = `${gate.kind}:${gate.gateId}`;
     if (gateRecords.has(key)) out.errors.push(`Duplicate gate evidence: ${gate.gateId}`);
     else gateRecords.set(key, gate);
   }
   const advancedArtifacts = [];
-  for (const gate of ledger.gates ?? []) {
+  for (const gate of gates) {
     if (gate.kind !== 'automatic' || gate.gateId !== 'VAL-LORE') continue;
-    for (const artifact of gate.artifacts ?? []) {
+    for (const artifact of Array.isArray(gate.artifacts) ? gate.artifacts : []) {
+      if (!artifact || typeof artifact !== 'object' || typeof artifact.path !== 'string' || !artifact.path.trim()) {
+        out.errors.push('VAL-LORE has an artifact record without a nonempty path');
+        continue;
+      }
       const file = path.isAbsolute(artifact.path) ? artifact.path : path.join(root, artifact.path);
       if (!fs.existsSync(file) || path.extname(file).toLowerCase() !== '.json') continue;
       try {
@@ -599,25 +613,29 @@ export function validateEvidence(ledger, root = SKILL_ROOT) {
       const rule = ruleMap.get(ruleId);
       if (!rule?.gate || (ledger.scope === 'fast' && (rule.gate.id === 'VAL-EVAL' || rule.gate.id === 'VAL-EVAL-DATA'))) continue;
       const gate = gateRecords.get(`${rule.gate.kind}:${rule.gate.id}`);
-      if (gate && !(gate.ruleIds ?? []).includes(ruleId)) out.errors.push(`${gate.gateId} does not evidence applicable rule ${ruleId}`);
+      if (gate && !(Array.isArray(gate.ruleIds) ? gate.ruleIds : []).includes(ruleId)) out.errors.push(`${gate.gateId} does not evidence applicable rule ${ruleId}`);
     }
   }
-  for (const gate of ledger.gates ?? []) {
+  for (const gate of gates) {
     if (gate.kind === 'automatic' && !validatorIds.has(gate.gateId)) out.errors.push(`Unknown automatic gate: ${gate.gateId}`);
     if (gate.kind === 'manual' && !manualIds.has(gate.gateId)) out.errors.push(`Unknown manual gate: ${gate.gateId}`);
-    for (const id of gate.ruleIds ?? []) if (!ruleMap.has(id)) out.errors.push(`${gate.gateId} references unknown rule: ${id}`);
-    for (const artifact of gate.artifacts ?? []) {
+    for (const id of Array.isArray(gate.ruleIds) ? gate.ruleIds : []) if (!ruleMap.has(id)) out.errors.push(`${gate.gateId} references unknown rule: ${id}`);
+    for (const artifact of Array.isArray(gate.artifacts) ? gate.artifacts : []) {
+      if (!artifact || typeof artifact !== 'object' || typeof artifact.path !== 'string' || !artifact.path.trim()) {
+        out.errors.push(`${gate.gateId} has an artifact record without a nonempty path`);
+        continue;
+      }
       const file = path.isAbsolute(artifact.path) ? artifact.path : path.join(root, artifact.path);
       if (!fs.existsSync(file)) out.errors.push(`${gate.gateId} checked missing artifact: ${artifact.path}`);
       else if (artifact.sha256 !== sha256File(file)) out.errors.push(`${gate.gateId} artifact hash mismatch: ${artifact.path}`);
     }
-    if (!gate.evidence?.trim()) out.errors.push(`${gate.gateId} lacks evidence`);
+    if (typeof gate.evidence !== 'string' || !gate.evidence.trim()) out.errors.push(`${gate.gateId} lacks evidence`);
     if (gate.status === 'PASS' && gate.kind === 'automatic') {
       if (!gate.command || !gate.cwd || gate.exitCode !== 0) out.errors.push(`${gate.gateId} has PASS without successful command evidence`);
       if (typeof gate.cwd !== 'string' || !path.isAbsolute(gate.cwd)) out.errors.push(`${gate.gateId} has automatic PASS without an absolute cwd`);
-      const attempts = gate.attempts ?? [];
+      const attempts = Array.isArray(gate.attempts) ? gate.attempts : [];
       if (!attempts.length) out.errors.push(`${gate.gateId} has automatic PASS without a recorded command attempt`);
-      else if (!attempts.some((attempt) => attempt.exitCode === 0 && typeof attempt.stdout === 'string' && typeof attempt.stderr === 'string' && `${attempt.stdout}${attempt.stderr}`.trim())) {
+      else if (!attempts.some((attempt) => attempt && typeof attempt === 'object' && attempt.exitCode === 0 && typeof attempt.stdout === 'string' && typeof attempt.stderr === 'string' && `${attempt.stdout}${attempt.stderr}`.trim())) {
         out.errors.push(`${gate.gateId} has automatic PASS without a successful transcript/log attempt`);
       }
       if (artifactGateIds.has(gate.gateId) && !(gate.artifacts?.length > 0)) out.errors.push(`${gate.gateId} has PASS without an artifact SHA-256 record`);
@@ -625,17 +643,17 @@ export function validateEvidence(ledger, root = SKILL_ROOT) {
     if (gate.status === 'PASS' && gate.kind === 'manual') {
       if (!gate.reviewerRunId || gate.reviewerRunId === ledger.runId) out.errors.push(`${gate.gateId} has manual PASS without independent reviewerRunId`);
       const policy = manual.gates.find((candidate) => candidate.id === gate.gateId);
-      const records = gate.reviewEvidence ?? [];
+      const records = Array.isArray(gate.reviewEvidence) ? gate.reviewEvidence : [];
       for (const criterion of policy?.requiredEvidence ?? []) {
-        const record = records.find((candidate) => candidate.criterion === criterion);
-        if (!record?.evidence?.trim()) out.errors.push(`${gate.gateId} lacks structured manual evidence for: ${criterion}`);
+        const record = records.find((candidate) => candidate && typeof candidate === 'object' && candidate.criterion === criterion);
+        if (typeof record?.evidence !== 'string' || !record.evidence.trim()) out.errors.push(`${gate.gateId} lacks structured manual evidence for: ${criterion}`);
       }
     }
     if (gate.status === 'FAIL' && gate.kind === 'automatic' && (!Number.isInteger(gate.exitCode) || gate.exitCode === 0 || gate.exitCode === 3)) out.errors.push(`${gate.gateId} FAIL is inconsistent with exitCode ${gate.exitCode}`);
     if (gate.status === 'BLOCKED' && gate.kind === 'automatic' && gate.exitCode !== 3) out.errors.push(`${gate.gateId} BLOCKED is inconsistent with exitCode ${gate.exitCode}`);
     if (gate.status === 'N/A') {
-      if (!gate.naReason?.trim()) out.errors.push(`${gate.gateId} has N/A without reason`);
-      for (const id of gate.ruleIds ?? []) if (!ruleMap.get(id)?.naAllowed) out.errors.push(`${gate.gateId} marks non-optional ${id} N/A`);
+      if (typeof gate.naReason !== 'string' || !gate.naReason.trim()) out.errors.push(`${gate.gateId} has N/A without reason`);
+      for (const id of Array.isArray(gate.ruleIds) ? gate.ruleIds : []) if (!ruleMap.get(id)?.naAllowed) out.errors.push(`${gate.gateId} marks non-optional ${id} N/A`);
       if (gate.kind === 'manual') {
         const policy = manual.gates.find((candidate) => candidate.id === gate.gateId);
         if (!policy?.naAllowed || !policy.naWhen) out.errors.push(`${gate.gateId} has no manual N/A policy`);
@@ -643,14 +661,14 @@ export function validateEvidence(ledger, root = SKILL_ROOT) {
     }
     if (gate.status === 'FAIL' && gate.correction && !(gate.attempts?.length > 1)) out.errors.push(`${gate.gateId} claims repair without a rerun attempt`);
   }
-  const statuses = (ledger.gates ?? []).map((gate) => gate.status);
+  const statuses = gates.map((gate) => gate.status);
   const derivedStatus = statuses.includes('BLOCKED') ? 'BLOCKED' : statuses.includes('FAIL') ? 'FAIL' : 'PASS';
   if (ledger.overallStatus !== derivedStatus) {
     if (ledger.overallStatus === 'PASS' && derivedStatus !== 'PASS') out.errors.push('overallStatus PASS contains FAIL or BLOCKED gate');
     else out.errors.push(`overallStatus ${ledger.overallStatus} is inconsistent with gate-derived ${derivedStatus}`);
   }
   if (ledger.overallStatus === 'PASS' && out.errors.length) out.errors.push('overallStatus PASS is invalid because evidence validation failed');
-  out.evidence.push(`${ledger.gates?.length ?? 0} gates and ${ledger.references?.length ?? 0} references checked`);
+  out.evidence.push(`${gates.length} gates and ${Array.isArray(ledger.references) ? ledger.references.length : 0} references checked`);
   if (advancedArtifacts.length) out.evidence.push(`${advancedArtifacts.length} advanced lorebook artifact(s) required simulator workflow`);
   return out;
 }
