@@ -95,11 +95,25 @@ export async function executeRuntimeGate({ adapter, input, ruleId, name = 'world
   return runtimeGateResult({ adapter, evidence, ruleId, name });
 }
 
-export function simulationEvidence({ trace, ruleId }) {
-  return {
-    status: trace?.errors?.length ? 'FAIL' : trace?.blockers?.length ? 'BLOCKED' : 'PASS',
+export function simulationEvidence({ trace, ruleId } = {}) {
+  const blocked = (blocker) => ({
+    status: 'BLOCKED',
     kind: 'simulation',
     ruleId,
-    evidence: { simulated: true, runtimeObserved: false, seed: trace?.seed, trace },
+    blocker,
+    evidence: { simulated: true, runtimeObserved: false, seed: null, trace: null },
+  });
+  if (!trace || typeof trace !== 'object' || Array.isArray(trace)) {
+    return blocked('SIMULATION_TRACE_MISSING');
+  }
+  if ((trace.errors != null && !Array.isArray(trace.errors))
+    || (trace.blockers != null && !Array.isArray(trace.blockers))) {
+    return blocked('SIMULATION_TRACE_INVALID');
+  }
+  return {
+    status: trace.errors?.length ? 'FAIL' : trace.blockers?.length ? 'BLOCKED' : 'PASS',
+    kind: 'simulation',
+    ruleId,
+    evidence: { simulated: true, runtimeObserved: false, seed: trace.seed, trace },
   };
 }
