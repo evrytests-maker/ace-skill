@@ -1434,6 +1434,7 @@ export function simulateWorldInfo(input = {}) {
   const included = [];
   const includedIds = new Set();
   const activatedGroups = new Set();
+  const failedProbability = new Set();
   let recursiveText = '';
   let scanSkew = 0;
   let scanState = 'INITIAL';
@@ -1460,7 +1461,7 @@ export function simulateWorldInfo(input = {}) {
     loopCount += 1;
     const levelCandidates = [];
     for (const entry of normalized.entries) {
-      if (includedIds.has(entry.id)) continue;
+      if (includedIds.has(entry.id) || failedProbability.has(entry.id)) continue;
       const candidate = {
         entry,
         level: recursionLevel,
@@ -1536,33 +1537,6 @@ export function simulateWorldInfo(input = {}) {
               : 'KEY_MATCHED'
       );
 
-      const threshold = entry.useProbability === false
-        ? 100
-        : Math.max(0, Math.min(100, finiteNumber(entry.probability, 100)));
-      const roll = threshold === 0 || threshold === 100
-        ? { value: 0, label: `probability:${entry.id}`, index: null }
-        : prng.next(`probability:${entry.id}`);
-      const probabilityPassed = timed.forced
-        || entry.useProbability === false
-        || threshold === 100
-        || (threshold > 0 && roll.value * 100 < threshold);
-      trace.probability.push({
-        entryId: entry.id,
-        useProbability: entry.useProbability !== false,
-        threshold,
-        roll,
-        passed: probabilityPassed,
-        bypassReason: timed.forced
-          ? 'TIMED_STICKY_ACTIVE'
-          : entry.useProbability === false
-            ? 'USE_PROBABILITY_DISABLED'
-            : null,
-      });
-      if (!probabilityPassed) {
-        candidate.reasons.push('PROBABILITY_REJECTED');
-        trace.candidates.push(summary(candidate, 'REJECTED'));
-        continue;
-      }
       levelCandidates.push(candidate);
     }
 
@@ -1575,9 +1549,48 @@ export function simulateWorldInfo(input = {}) {
       }
     }
 
+    // Release code filters inclusion groups first, then rolls probability only
+    // for the group winners. A failed check is remembered so a later recursion
+    // wave cannot re-roll the same entry.
+    const orderedSelected = [...selected].sort((a, b) => activationCompare(a, b, settings.sourceStrategy));
+    const probabilityPassed = [];
+    for (const candidate of orderedSelected) {
+      const entry = candidate.entry;
+      const threshold = entry.useProbability === false
+        ? 100
+        : Math.max(0, Math.min(100, finiteNumber(entry.probability, 100)));
+      const roll = threshold === 0 || threshold === 100
+        ? { value: 0, label: `probability:${entry.id}`, index: null }
+        : prng.next(`probability:${entry.id}`);
+      const passed = candidate.timed?.forced
+        || entry.useProbability === false
+        || threshold === 100
+        || (threshold > 0 && roll.value * 100 < threshold);
+      trace.probability.push({
+        entryId: entry.id,
+        useProbability: entry.useProbability !== false,
+        threshold,
+        roll,
+        passed,
+        bypassReason: candidate.timed?.forced
+          ? 'TIMED_STICKY_ACTIVE'
+          : entry.useProbability === false
+            ? 'USE_PROBABILITY_DISABLED'
+            : null,
+      });
+      if (!passed) {
+        failedProbability.add(entry.id);
+        candidate.reasons.push('PROBABILITY_REJECTED');
+        trace.candidates.push(summary(candidate, 'REJECTED'));
+        continue;
+      }
+      probabilityPassed.push(candidate);
+    }
+
     const wave = [];
     const insertedThisWave = [];
-    for (const candidate of [...selected].sort((a, b) => activationCompare(a, b, settings.sourceStrategy))) {
+    let budgetOverflowed = false;
+    for (const candidate of probabilityPassed) {
       trace.candidates.push(summary(candidate, 'ELIGIBLE'));
       const tokens = Number(tokenCounter(candidate.entry.content));
       if (!Number.isFinite(tokens) || tokens < 0) {
@@ -1587,7 +1600,8 @@ export function simulateWorldInfo(input = {}) {
       }
       const before = remaining;
       const ignoreBudget = candidate.entry.ignoreBudget;
-      if (!ignoreBudget && tokens > remaining) {
+      if (!ignoreBudget && (budgetOverflowed || tokens > remaining)) {
+        budgetOverflowed = true;
         trace.budget.push({
           entryId: candidate.entry.id,
           level: recursionLevel,
@@ -1637,6 +1651,7 @@ export function simulateWorldInfo(input = {}) {
     if (wave.length
       && settings.recursiveScanning
       && recurseContent
+      && !budgetOverflowed
       && !recursionLimitReached()) {
       recursiveText += `${recursiveText ? '\n' : ''}${recurseContent}`;
       scanState = 'RECURSION';
