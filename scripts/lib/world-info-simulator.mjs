@@ -906,8 +906,10 @@ function applyGroups(candidates, prng, trace, settings, activatedGroups) {
     }
 
     const scoringMembers = members.filter((candidate) => resolvedGroupScoring(candidate.entry, settings));
-    const maxScore = scoringMembers.length
-      ? Math.max(...scoringMembers.map((candidate) => candidate.matching?.score ?? 0))
+    // Release code compares scoring members against the highest score of all
+    // members, including members excluded from scoring.
+    const maxScore = members.length
+      ? Math.max(...members.map((candidate) => candidate.matching?.score ?? 0))
       : null;
     for (const candidate of [...scoringMembers]) {
       if ((candidate.matching?.score ?? 0) < maxScore) {
@@ -1172,6 +1174,7 @@ function basePromptSkeleton(input) {
 function placeEntries(included, input, trace) {
   const segments = [];
   const outletEntries = {};
+  const outletGroups = new Map();
   const sorted = [...included].sort((a, b) => activationCompare(a, b, trace.settings.sourceStrategy));
   for (const candidate of sorted) {
     const entry = candidate.entry;
@@ -1181,8 +1184,8 @@ function placeEntries(included, input, trace) {
         trace.outlets.skipped.push({ entryId: entry.id, reason: 'OUTLET_NAME_MISSING' });
         continue;
       }
-      if (!outletEntries[key]) outletEntries[key] = [];
-      outletEntries[key].push(entry.content);
+      if (!outletGroups.has(key)) outletGroups.set(key, []);
+      outletGroups.get(key).push(entry);
       trace.outlets.entries.push({ entryId: entry.id, outletName: key, order: entry.order });
       continue;
     }
@@ -1212,6 +1215,17 @@ function placeEntries(included, input, trace) {
       position: entry.position,
       depth: segment.depth,
       role: entry.role,
+    });
+  }
+  for (const [key, entries] of outletGroups) {
+    entries.sort((a, b) => (b.order - a.order)
+      || (a.index - b.index)
+      || String(a.id).localeCompare(String(b.id)));
+    Object.defineProperty(outletEntries, key, {
+      value: entries.map((entry) => entry.content),
+      enumerable: true,
+      configurable: true,
+      writable: true,
     });
   }
   trace.outlets.values = outletEntries;
@@ -1281,7 +1295,8 @@ function automationEvents(included, input, trace, settings) {
   const adapter = input.automationAdapter ?? input.automation_adapter;
   const seen = new Set();
   const events = [];
-  for (const candidate of [...included].sort((a, b) => activationCompare(a, b, settings.sourceStrategy))) {
+  for (const candidate of [...included].sort((a, b) => (a.level - b.level)
+    || activationCompare(a, b, settings.sourceStrategy))) {
     const automationId = candidate.entry.automationId.trim();
     if (!automationId || seen.has(automationId)) continue;
     seen.add(automationId);
@@ -1419,6 +1434,7 @@ export function simulateWorldInfo(input = {}) {
   const included = [];
   const includedIds = new Set();
   const activatedGroups = new Set();
+  const failedProbability = new Set();
   let recursiveText = '';
   let scanSkew = 0;
   let scanState = 'INITIAL';
@@ -1445,7 +1461,7 @@ export function simulateWorldInfo(input = {}) {
     loopCount += 1;
     const levelCandidates = [];
     for (const entry of normalized.entries) {
-      if (includedIds.has(entry.id)) continue;
+      if (includedIds.has(entry.id) || failedProbability.has(entry.id)) continue;
       const candidate = {
         entry,
         level: recursionLevel,
@@ -1521,33 +1537,6 @@ export function simulateWorldInfo(input = {}) {
               : 'KEY_MATCHED'
       );
 
-      const threshold = entry.useProbability === false
-        ? 100
-        : Math.max(0, Math.min(100, finiteNumber(entry.probability, 100)));
-      const roll = threshold === 0 || threshold === 100
-        ? { value: 0, label: `probability:${entry.id}`, index: null }
-        : prng.next(`probability:${entry.id}`);
-      const probabilityPassed = timed.forced
-        || entry.useProbability === false
-        || threshold === 100
-        || (threshold > 0 && roll.value * 100 < threshold);
-      trace.probability.push({
-        entryId: entry.id,
-        useProbability: entry.useProbability !== false,
-        threshold,
-        roll,
-        passed: probabilityPassed,
-        bypassReason: timed.forced
-          ? 'TIMED_STICKY_ACTIVE'
-          : entry.useProbability === false
-            ? 'USE_PROBABILITY_DISABLED'
-            : null,
-      });
-      if (!probabilityPassed) {
-        candidate.reasons.push('PROBABILITY_REJECTED');
-        trace.candidates.push(summary(candidate, 'REJECTED'));
-        continue;
-      }
       levelCandidates.push(candidate);
     }
 
@@ -1560,11 +1549,61 @@ export function simulateWorldInfo(input = {}) {
       }
     }
 
+    // Release code filters inclusion groups first, then rolls probability only
+    // for the group winners. A failed check is remembered so a later recursion
+    // wave cannot re-roll the same entry.
+    const orderedSelected = [...selected].sort((a, b) => activationCompare(a, b, settings.sourceStrategy));
+    const probabilityPassed = [];
+    for (const candidate of orderedSelected) {
+      const entry = candidate.entry;
+      const threshold = entry.useProbability === false
+        ? 100
+        : Math.max(0, Math.min(100, finiteNumber(entry.probability, 100)));
+      const roll = threshold === 0 || threshold === 100
+        ? { value: 0, label: `probability:${entry.id}`, index: null }
+        : prng.next(`probability:${entry.id}`);
+      const passed = candidate.timed?.forced
+        || entry.useProbability === false
+        || threshold === 100
+        || (threshold > 0 && roll.value * 100 < threshold);
+      trace.probability.push({
+        entryId: entry.id,
+        useProbability: entry.useProbability !== false,
+        threshold,
+        roll,
+        passed,
+        bypassReason: candidate.timed?.forced
+          ? 'TIMED_STICKY_ACTIVE'
+          : entry.useProbability === false
+            ? 'USE_PROBABILITY_DISABLED'
+            : null,
+      });
+      if (!passed) {
+        failedProbability.add(entry.id);
+        candidate.reasons.push('PROBABILITY_REJECTED');
+        trace.candidates.push(summary(candidate, 'REJECTED'));
+        continue;
+      }
+      probabilityPassed.push(candidate);
+    }
+
     const wave = [];
     const insertedThisWave = [];
-    for (const candidate of [...selected].sort((a, b) => activationCompare(a, b, settings.sourceStrategy))) {
+    let budgetOverflowed = false;
+    for (const candidate of probabilityPassed) {
       trace.candidates.push(summary(candidate, 'ELIGIBLE'));
-      const tokens = Number(tokenCounter(candidate.entry.content));
+      let tokens;
+      try {
+        tokens = Number(tokenCounter(candidate.entry.content));
+      } catch (error) {
+        errors.push({
+          code: 'TOKEN_COUNTER_INVALID',
+          entryId: candidate.entry.id,
+          message: `token counter failed: ${error.message}`,
+        });
+        updateCandidate(trace, candidate.entry.id, 'REJECTED', 'TOKEN_COUNTER_INVALID');
+        continue;
+      }
       if (!Number.isFinite(tokens) || tokens < 0) {
         errors.push({ code: 'TOKEN_COUNTER_INVALID', entryId: candidate.entry.id });
         updateCandidate(trace, candidate.entry.id, 'REJECTED', 'TOKEN_COUNTER_INVALID');
@@ -1572,7 +1611,8 @@ export function simulateWorldInfo(input = {}) {
       }
       const before = remaining;
       const ignoreBudget = candidate.entry.ignoreBudget;
-      if (!ignoreBudget && tokens > remaining) {
+      if (!ignoreBudget && (budgetOverflowed || tokens > remaining)) {
+        budgetOverflowed = true;
         trace.budget.push({
           entryId: candidate.entry.id,
           level: recursionLevel,
@@ -1622,6 +1662,7 @@ export function simulateWorldInfo(input = {}) {
     if (wave.length
       && settings.recursiveScanning
       && recurseContent
+      && !budgetOverflowed
       && !recursionLimitReached()) {
       recursiveText += `${recursiveText ? '\n' : ''}${recurseContent}`;
       scanState = 'RECURSION';

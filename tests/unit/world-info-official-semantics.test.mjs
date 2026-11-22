@@ -367,3 +367,131 @@ for (const scenario of [
     assert.ok(result.errors.some((error) => error.code === scenario.code));
   });
 }
+
+test('official Outlet storage is safe for prototype-like names', () => {
+  const result = simulateWorldInfo({
+    systemPrompt: '{{outlet::toString}}|{{outlet::__proto__}}',
+    lorebook: {
+      entries: [
+        entry(1, { constant: true, position: 'outlet', outletName: 'toString', content: 'proto-safe' }),
+        entry(2, { constant: true, position: 'outlet', outletName: '__proto__', content: 'constructor-safe' }),
+      ],
+    },
+  });
+  assert.equal(result.status, 'PASS');
+  assert.equal(Object.hasOwn(result.outletEntries, 'toString'), true);
+  assert.deepEqual([...result.outletEntries.toString], ['proto-safe']);
+  assert.equal(Object.hasOwn(result.outletEntries, '__proto__'), true);
+  assert.equal(result.simulatedRawPrompt.find((row) => row.source === 'systemPrompt').content,
+    'proto-safe|constructor-safe');
+});
+
+test('official Outlet contents sort by descending Order regardless of activation bucket', () => {
+  const result = simulateWorldInfo({
+    history: ['trigger'],
+    lorebook: {
+      entries: [
+        entry(1, { constant: true, position: 'outlet', outletName: 'Memory', order: 100, content: 'low' }),
+        entry(2, { key: ['trigger'], position: 'outlet', outletName: 'Memory', order: 900, content: 'high' }),
+      ],
+    },
+  });
+  assert.deepEqual([...result.outletEntries.Memory], ['high', 'low']);
+});
+
+test('official Group Scoring compares scoring members against all member scores', () => {
+  const result = simulateWorldInfo({
+    history: ['head extra'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['head'], group: 'g', useGroupScoring: true, groupWeight: 100 }),
+        entry(2, { key: ['head', 'extra'], group: 'g', useGroupScoring: false, groupWeight: 1 }),
+      ],
+    },
+  });
+  const group = result.trace.groups[0];
+  assert.deepEqual(group.removed.filter((row) => row.reason === 'GROUP_SCORE_LOWER'), [
+    { id: '1', reason: 'GROUP_SCORE_LOWER' },
+  ]);
+  assert.equal(group.winner, '2');
+});
+
+test('official Automation order places direct activations before recursive ones', () => {
+  const result = simulateWorldInfo({
+    history: ['start'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['start'], order: 10, automationId: 'direct', content: 'alpha' }),
+        entry(2, { key: ['alpha'], order: 900, automationId: 'recursive', content: 'beta' }),
+      ],
+    },
+    settings: { recursiveScanning: true, maxRecursionDepth: 8 },
+  });
+  assert.deepEqual(result.trace.automation.map((event) => event.automationId), ['direct', 'recursive']);
+});
+
+test('official probability is rolled after inclusion groups', () => {
+  const result = simulateWorldInfo({
+    seed: 1,
+    history: ['head'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['head'], group: 'g', groupOverride: true, order: 100, probability: 0 }),
+        entry(2, { key: ['head'], group: 'g', groupWeight: 1, probability: 100 }),
+      ],
+    },
+  });
+  assert.deepEqual(result.includedEntryIds, []);
+  assert.equal(result.trace.groups[0].winner, '1');
+  assert.equal(result.trace.probability.find((row) => row.entryId === '1')?.passed, false);
+  assert.equal(result.trace.probability.some((row) => row.entryId === '2'), false);
+});
+
+test('official failed probability is not re-rolled in a later recursion wave', () => {
+  const result = simulateWorldInfo({
+    seed: 5,
+    history: ['go start'],
+    lorebook: {
+      entries: [
+        entry(1, { key: ['start'], probability: 0, content: 'alpha' }),
+        entry(2, { key: ['go'], probability: 100, content: 'start' }),
+      ],
+    },
+    settings: { recursiveScanning: true, maxRecursionDepth: 8 },
+  });
+  assert.deepEqual(result.includedEntryIds, ['2']);
+  assert.equal(result.trace.probability.filter((row) => row.entryId === '1').length, 1);
+});
+
+test('official budget overflow skips later non-ignore entries but keeps ignoreBudget entries', () => {
+  const sizes = { big: 12, small: 1, later: 1, keep: 1 };
+  const result = simulateWorldInfo({
+    history: ['k'],
+    tokenCounter: (content) => sizes[content],
+    budgetPolicy: { budget: 10 },
+    lorebook: {
+      entries: [
+        entry(1, { key: ['k'], order: 40, content: 'big' }),
+        entry(2, { key: ['k'], order: 30, content: 'small' }),
+        entry(3, { key: ['k'], order: 20, content: 'later' }),
+        entry(4, { key: ['k'], order: 10, content: 'keep', ignoreBudget: true }),
+      ],
+    },
+  });
+  assert.deepEqual(result.includedEntryIds, ['4']);
+  assert.ok(result.trace.budget
+    .filter((row) => ['1', '2', '3'].includes(row.entryId))
+    .every((row) => row.reason === 'BUDGET_EXCEEDED'));
+});
+
+test('official simulation fails closed when the token counter throws', () => {
+  const result = simulateWorldInfo({
+    history: ['k'],
+    tokenCounter: () => { throw new Error('tokenizer offline'); },
+    lorebook: { entries: [entry(1, { key: ['k'] })] },
+  });
+  assert.equal(result.status, 'FAIL');
+  assert.deepEqual(result.includedEntryIds, []);
+  assert.ok(result.errors.some((error) => error.code === 'TOKEN_COUNTER_INVALID'
+    && error.message.includes('tokenizer offline')));
+});
