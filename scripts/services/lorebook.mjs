@@ -15,20 +15,23 @@ const VALID_NUMERIC_POSITIONS = new Set([0, 1, 2, 3, 4, 5, 6, 7]);
 const BOOLEAN_FIELDS = Object.freeze([
   'constant', 'enabled', 'use_regex', 'selective', 'vectorized', 'disable',
   'ignoreBudget', 'excludeRecursion', 'preventRecursion', 'groupOverride', 'useProbability',
+  'caseSensitive', 'matchWholeWords', 'wholeWords',
 ]);
 const KNOWN_ENTRY_FIELDS = new Set([
   'id', 'uid', 'key', 'keys', 'keysecondary', 'secondary_keys', 'content', 'comment',
   'constant', 'enabled', 'disable', 'disabled', 'use_regex', 'selective', 'selectiveLogic',
   'keysecondarylogic', 'secondary_logic', 'vectorized', 'position', 'depth', 'role', 'order',
-  'insertion_order', 'outlet', 'automationId', 'automation_id', 'scanDepth', 'scan_depth',
+  'insertion_order', 'outlet', 'outletName', 'automationId', 'automation_id', 'scanDepth', 'scan_depth',
   'probability', 'useProbability', 'ignoreBudget', 'excludeRecursion', 'preventRecursion',
   'group', 'groups', 'inclusionGroup', 'groupOverride', 'groupWeight', 'weight', 'sticky',
   'cooldown', 'delay', 'characterFilter', 'character_filter', 'personaFilter', 'persona_filter',
   'tagFilter', 'tag_filter', 'generationTypes', 'generation_types', 'scope', 'attachments',
   'extensions', 'displayIndex', 'addMemo', 'matchPersonaDescription', 'matchCharacterDescription',
   'matchCharacterPersonality', 'matchCharacterDepthPrompt', 'matchScenario', 'matchCreatorNotes',
+  'caseSensitive', 'matchWholeWords', 'wholeWords',
 ]);
 const VALID_ROLES = new Set(['system', 'user', 'assistant']);
+const VALID_NUMERIC_ROLES = new Set([0, 1, 2]);
 
 function editDistance(left, right) {
   const row = Array.from({ length: right.length + 1 }, (_, index) => index);
@@ -289,13 +292,32 @@ function validateEntry(entry, fallbackId, report, options) {
   }
 
   const role = entry.role ?? entry.extensions?.role;
-  if (role !== undefined && !VALID_ROLES.has(role)) report.error('role must be system, user, or assistant', {
+  const roleValid = typeof role === 'number'
+    ? VALID_NUMERIC_ROLES.has(role)
+    : VALID_ROLES.has(role);
+  if (role !== undefined && !roleValid) report.error('role must be system, user, assistant, or numeric 0/1/2', {
     code: 'LORE_ROLE', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'role',
   });
   const outlet = entry.outlet ?? entry.extensions?.outlet;
   if (outlet !== undefined && (typeof outlet !== 'string' || !outlet.trim())) report.error('outlet must be a non-empty string', {
     code: 'LORE_OUTLET', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'outlet',
   });
+  const outletName = entry.outletName ?? entry.extensions?.outletName;
+  if (outletName !== undefined && typeof outletName !== 'string') report.error('outletName must be a string', {
+    code: 'LORE_OUTLET_NAME_STRING', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'outletName',
+  });
+  const position = entry.position ?? entry.extensions?.position;
+  if (position === 'outlet' || position === 7) {
+    const resolvedOutletName = typeof outletName === 'string'
+      ? outletName
+      : (typeof outlet === 'string' ? outlet : '');
+    if (!resolvedOutletName.trim()) report.error('outlet position requires a non-empty outletName', {
+      code: 'LORE_OUTLET_NAME_REQUIRED', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'outletName',
+    });
+    else if (resolvedOutletName !== resolvedOutletName.trim()) report.error('outletName must not have leading or trailing padding', {
+      code: 'LORE_OUTLET_NAME_PADDING', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'outletName',
+    });
+  }
   const automationId = entry.automationId ?? entry.automation_id ?? entry.extensions?.automation_id;
   if (automationId !== undefined && (typeof automationId !== 'string' || !automationId.trim())) report.error('Automation ID must be a non-empty string', {
     code: 'LORE_AUTOMATION_ID', ruleId: 'ACE-LORE-ADVANCED', entryId: id, field: 'automationId',
@@ -414,6 +436,13 @@ export function checkLorebookActivation(artifact, {
       logicName: getSelectiveLogicName(logicValue),
     };
     if (text && entry.constant !== true && logic !== null) {
+      const entryCaseSensitive = entry.caseSensitive
+        ?? entry.extensions?.case_sensitive
+        ?? caseSensitive;
+      const entryWholeWords = entry.matchWholeWords
+        ?? entry.wholeWords
+        ?? entry.extensions?.match_whole_words
+        ?? wholeWords;
       try {
         evaluation = evaluateKeyAndSecondary({
           primaryKeys: keys,
@@ -422,7 +451,7 @@ export function checkLorebookActivation(artifact, {
           selective: entry.selective === true,
           selectiveLogic: logic,
           forceSecondary,
-          opts: { caseSensitive, wholeWords, macros },
+          opts: { caseSensitive: entryCaseSensitive, wholeWords: entryWholeWords, macros },
         });
       } catch (error) {
         evaluation = { ...evaluation, active: false, valid: false, error: error.message, secondaryReason: error.message };

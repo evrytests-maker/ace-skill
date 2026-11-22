@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { validateLorebook } from '../../scripts/services/lorebook.mjs';
+import { checkLorebookActivation, validateLorebook } from '../../scripts/services/lorebook.mjs';
 
 function entry(overrides = {}) {
   return {
@@ -49,4 +49,38 @@ test('conflicting aliases fail closed while identical aliases are only advisory'
   const duplicate = validateLorebook({ entries: [entry({ key: ['archive'], keys: ['archive'] })] });
   assert.equal(duplicate.status, 'PASS');
   assert.ok(duplicate.warnings.some((issue) => issue.code === 'LORE_DUPLICATE_KEY_ALIAS'));
+});
+
+test('native numeric role and per-entry matching options are accepted', () => {
+  const result = validateLorebook({ entries: [entry({
+    position: 'at_depth', depth: 2, role: 0, caseSensitive: true, matchWholeWords: false,
+  })] });
+  assert.equal(result.status, 'PASS', JSON.stringify(result.errors));
+  for (const role of [1, 2]) {
+    const numeric = validateLorebook({ entries: [entry({ position: 'at_depth', depth: 2, role })] });
+    assert.equal(numeric.status, 'PASS', JSON.stringify(numeric.errors));
+  }
+  const invalid = validateLorebook({ entries: [entry({ role: 3 })] });
+  assert.equal(invalid.status, 'FAIL');
+  assert.ok(invalid.errors.some((issue) => issue.code === 'LORE_ROLE'));
+});
+
+test('outlet position requires a non-empty, unpadded outletName', () => {
+  const missing = validateLorebook({ entries: [entry({ position: 'outlet' })] });
+  assert.equal(missing.status, 'FAIL');
+  assert.ok(missing.errors.some((issue) => issue.code === 'LORE_OUTLET_NAME_REQUIRED'));
+  const padded = validateLorebook({ entries: [entry({ position: 'outlet', outletName: ' Memory ' })] });
+  assert.equal(padded.status, 'FAIL');
+  assert.ok(padded.errors.some((issue) => issue.code === 'LORE_OUTLET_NAME_PADDING'));
+  const valid = validateLorebook({ entries: [entry({ position: 'outlet', outletName: 'Memory' })] });
+  assert.equal(valid.status, 'PASS', JSON.stringify(valid.errors));
+});
+
+test('activation honors entry-level case and whole-word overrides', () => {
+  const artifact = { entries: [entry({
+    key: ['Mira'], content: 'Mira checks the archive lock.', caseSensitive: true, matchWholeWords: false,
+  })] };
+  assert.equal(checkLorebookActivation(artifact, { text: 'mira' }).data.entries[0].active, false);
+  assert.equal(checkLorebookActivation(artifact, { text: 'Miramar' }).data.entries[0].active, true);
+  assert.equal(checkLorebookActivation(artifact, { text: 'Mira' }).data.entries[0].active, true);
 });
