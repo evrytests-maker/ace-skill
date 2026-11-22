@@ -652,20 +652,26 @@ function buildEntryScanBuffer(entry, input, settings, {
   const text = segments.length ? `\x01${segments.map((segment) => segment.text).join(joiner)}` : '';
   return { text, segments, scanDepth: effectiveDepth, scanState };
 }
+function parseRuntimeRegex(value) {
+  const input = String(value);
+  const match = input.match(/^\/([\w\W]+?)\/([gimsuy]*)$/u);
+  if (!match) return null;
+  let [, pattern, flags] = match;
+  // SillyTavern requires a non-empty pattern and rejects unescaped internal
+  // delimiters; such keys are treated as plaintext at runtime.
+  if (pattern.match(/(^|[^\\])\//u)) return null;
+  pattern = pattern.replace('\\/', '/');
+  try {
+    return new RegExp(pattern, flags);
+  } catch {
+    return null;
+  }
+}
 function regexOrTextMatch(key, text, { caseSensitive = false, wholeWords = false } = {}) {
   if (!key) return { matched: false, code: 'KEY_EMPTY' };
   const source = String(key);
-  if (source.startsWith('/')) {
-    const last = source.lastIndexOf('/');
-    if (last > 0) {
-      try {
-        const regex = new RegExp(source.slice(1, last), source.slice(last + 1));
-        return { matched: regex.test(text), code: 'REGEX' };
-      } catch (error) {
-        return { matched: false, code: 'REGEX_INVALID', error: error.message };
-      }
-    }
-  }
+  const regex = parseRuntimeRegex(source);
+  if (regex) return { matched: regex.test(text), code: 'REGEX' };
   const needle = caseSensitive ? source : source.toLowerCase();
   const haystack = caseSensitive ? String(text) : String(text).toLowerCase();
   if (!wholeWords) return { matched: haystack.includes(needle), code: 'TEXT' };
