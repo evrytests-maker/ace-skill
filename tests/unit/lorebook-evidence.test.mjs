@@ -47,3 +47,19 @@ test('simulation evidence can never masquerade as runtime evidence', () => {
   assert.equal(result.evidence.simulated, true);
   assert.equal(result.evidence.runtimeObserved, false);
 });
+
+test('simulation evidence is BLOCKED without a usable trace', () => {
+  for (const trace of [undefined, null, 'trace', 42, []]) {
+    const result = simulationEvidence({ trace, ruleId: 'G-SIM' });
+    assert.equal(result.status, 'BLOCKED');
+    assert.equal(result.blocker, 'SIMULATION_TRACE_MISSING');
+    assert.equal(result.evidence.simulated, true);
+    assert.equal(result.evidence.runtimeObserved, false);
+  }
+  for (const trace of [{ errors: 'bad' }, { blockers: {} }]) {
+    const result = simulationEvidence({ trace, ruleId: 'G-SIM' });
+    assert.equal(result.status, 'BLOCKED');
+    assert.equal(result.blocker, 'SIMULATION_TRACE_INVALID');
+  }
+  assert.equal(simulationEvidence().status, 'BLOCKED');
+});
